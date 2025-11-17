@@ -8,7 +8,7 @@ Kalfin Jefwin Setiawan Gultom 2406360256 - Modul Trainer Booking
 Fadhil Daffa Putra Irawan 2406438271 - Modul Places
 Marvel Irawan 2406421346 - Modul Search
 
-### *Tautan APK (Tidak harus ada pada saat Tahap I. Tautan APK dapat ditambahkan secara menyusul ke README.md setelah selesai mengerjakan Tahap II.)
+### Tautan APK (Tidak harus ada pada saat Tahap I. Tautan APK dapat ditambahkan secara menyusul ke README.md setelah selesai mengerjakan Tahap II.)
 
 ### Deskripsi aplikasi (nama dan fungsi aplikasi)
 Nama Aplikasi : __`FitMatrix`__ Deskripsi Aplikasi: platform yang membantu pengguna menemukan rekomendasi tempat olahraga, baik yang berbayar maupun gratis 
