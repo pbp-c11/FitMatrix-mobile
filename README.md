@@ -1,12 +1,12 @@
 # README.md Kelompok C11
 
 ## aftar nama anggota kelompok
-Dhea Anggrayningsih Syah Rony 2406437262 - Modul Review
-Gregorius Ega Aditama Sudjali 2406434153 - Modul Auth & Profile
-kanayra maritza sanika adeeva 2406437880 - Modul Wishlist
-Kalfin Jefwin Setiawan Gultom 2406360256 - Modul Trainer Booking
-Fadhil Daffa Putra Irawan 2406438271 - Modul Places
-Marvel Irawan 2406421346 - Modul Search
+Dhea Anggrayningsih Syah Rony 2406437262 - Modul `Review`
+Gregorius Ega Aditama Sudjali 2406434153 - Modul `Auth & Profile`
+kanayra maritza sanika adeeva 2406437880 - Modul `Wishlist`
+Kalfin Jefwin Setiawan Gultom 2406360256 - Modul `Trainer Booking`
+Fadhil Daffa Putra Irawan 2406438271 - Modul `Places`
+Marvel Irawan 2406421346 - Modul `Search`
 
 ### Tautan APK (Tidak harus ada pada saat Tahap I. Tautan APK dapat ditambahkan secara menyusul ke README.md setelah selesai mengerjakan Tahap II.)
 
