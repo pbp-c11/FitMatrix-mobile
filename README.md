@@ -1,6 +1,6 @@
 # README.md Kelompok C11
 
-## aftar nama anggota kelompok
+## Daftar nama anggota kelompok
 Dhea Anggrayningsih Syah Rony 2406437262 - Modul `Review`
 Gregorius Ega Aditama Sudjali 2406434153 - Modul `Auth & Profile`
 kanayra maritza sanika adeeva 2406437880 - Modul `Wishlist`
