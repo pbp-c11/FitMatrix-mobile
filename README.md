@@ -1,107 +1,120 @@
-# README.md Kelompok C11
+# README.md TK PBP C11
 
-## Daftar nama anggota kelompok
-Dhea Anggrayningsih Syah Rony 2406437262 - Modul `Review`
-Gregorius Ega Aditama Sudjali 2406434153 - Modul `Auth & Profile`
-kanayra maritza sanika adeeva 2406437880 - Modul `Wishlist`
-Kalfin Jefwin Setiawan Gultom 2406360256 - Modul `Trainer Booking`
-Fadhil Daffa Putra Irawan 2406438271 - Modul `Places`
-Marvel Irawan 2406421346 - Modul `Search`
+# Daftar Anggota Kelompok TK-PBP C11
+- Dhea Anggrayningsih Syah Rony 2406437262 - Modul Review
+- Gregorius Ega Aditama Sudjali 2406434153 - Modul Authentication
+- kanayra maritza sanika adeeva 2406437880 - Modul Wishlist
+- Kalfin Jefwin Setiawan Gultom 2406360256 - Modul Trainer Booking
+- Fadhil Daffa Putra Irawan 2406438271 - Modul Places
+- Marvel Irawan 2406421346 - Modul Search
 
-### Tautan APK (Tidak harus ada pada saat Tahap I. Tautan APK dapat ditambahkan secara menyusul ke README.md setelah selesai mengerjakan Tahap II.)
+## Deskripsi Aplikasi 📱
+🏋️‍♂️ FitMatrix adalah aplikasi yang membantu khalayak untuk menemukan rekomendasi tempat olahraga 🏟️ di wilayah Jabodetabek, baik yang berbayar maupun gratis dan memungkinkan mereka untuk menyimpan tempat favorit sesuai preferensi mereka dari rekomendasi
+yang ada ke dalam wishlist serta memberi review setelah merasakan pengalaman berolahraga langsung di tempat. Selain itu, FitMatrix juga membantu user untuk menemukan rekomendasi personal trainer/ coach dan membooking sesi bersama mereka.
 
-### Deskripsi aplikasi (nama dan fungsi aplikasi)
-Nama Aplikasi : __`FitMatrix`__ Deskripsi Aplikasi: platform yang membantu pengguna menemukan rekomendasi tempat olahraga, baik yang berbayar maupun gratis 
-(misalnya track lari, gym, atau lapangan olahraga)di wilayah Jabodetabek. Pengguna dapat memfilter tempat berdasarkan cabang olahraga dan lokasi, menyimpan tempat favorit ke wishlist, serta melihat tempat populer (Hot Places).
-Tujuan aplikasi ini adalah mempermudah masyarakat untuk menemukan sarana olahraga sesuai kebutuhan dan preferensi mereka serta mencari dan melakukan appointment personal trainer/coach yang sesuai dengan kebutuhan user masing-masing di tempat-tempat yang berbeda.
+## 👥 Peran atau aktor pengguna aplikasi
+1. User(biasa) – ditargetkan pada sebagian besar Sport Enthusiast.
+User ini ditargetkan pada sebagian besar Sport Enthusiast yang butuh referensi tempat yang bervariasi, baik yang berbayar maupun gratis. Mereka bisa memanfaatkan fitur-fitur di aplikasi kami:
+- 🎯 Filter berdasarkan cabang olahraga
+- 📍 Filter berdasarkan lokasi
+- ⭐ Menyimpan tempat olahraga ke wishlist
+- 👍 Melakukan review tempat olahraga
+- 🔥 Mendapatkan rekomendsi Trending Coordinates
+- 🤝 Melakukan booking appointment Personal trainer/Coach
 
+2. Admin -  bertugas mengelola data di aplikasi:
+- ➕ Menambah lokasi spot olahraga & personal trainer/coach di Jabodetabek
+- ✏️ Mengedit dan menghapus data spot olahraga & trainer
+- ❌ Cancel appointment PT/Coach
 
-# Daftar modul yang diimplementasikan beserta pembagian kerja per anggota
-
-### 1. `Auth & Profile` (Modul Autentikasi dan Profil Pengguna)
-Dikerjakan oleh Gregorius Ega Aditama Sudjali
-Modul ini mengelola registrasi, login, dan profil pengguna. Pengguna dapat mengelola data pribadi mereka, serta mengakses fitur-fitur lain seperti wishlist dan review.
-Fitur Utama:
-*  Registrasi, login, dan pengelolaan akun.
-*  Mengelola profile pengguna (nama, foto profile, password)
-*   enyimpan riwayat aktivitas pengguna (seperti appointment saat itu, histori appointments, wishlist, rating).
-
-Integrasi: Terkoneksi dengan modul `Wishlist`, `Review`, dan `Appointment`.
-
-### 2. `Search` (Modul Pencarian) 
-Dikerjakan oleh Marvel Irawan
-Menyediakan fitur pencarian untuk menemukan tempat olahraga berdasarkan kategori olahraga, lokasi, berbayar/gratis.
-Fitur Utama:
-* Pencarian berdasarkan kata kunci.
-* Filter berdasarkan olahraga, lokasi, dan harga (berbayar atau gratis).
-
-Integrasi: Terkoneksi dengan modul `Place` dan `Hot Deals`.
-
-### 3. `Place` (Modul Tempat Olahraga) Fungsi: Mengelola data tempat olahraga seperti gym, lapangan futsal, atau track lari, dan menampilkan rincian informasi tempat.
-Dikerjakan oleh Fadhil Daffa
+## Daftar modul yang diimplementasikan beserta pembagian kerja per anggota 🗂️
+# 👥 Auth & Profile (Modul Autentikasi dan Profil Pengguna)
+-> Modul ini mengelola registrasi, login, dan profil pengguna. Pengguna yang sudah login dapat mengelola data pribadi mereka, serta mengakses fitur-fitur lain seperti add tempat ke wishlist dan memberikan review suatu tempat. Dikerjakan oleh Gregorius Ega
 
 Fitur Utama:
-* Menyimpan data tempat olahraga (lokasi, isFree(tempat ini berbayar atau gratis), fasilitas, deskripsi, harga jika berbayar).
-* Menyediakan peta lokasi dan jam operasional (range waktu dari buka sampe tutup).
-* Menampilkan tempat olahraga yang paling populer berdasarkan rating rata-rata.
-* Tempat dengan rating tertinggi ditampilkan sebagai Hot Places.
+- Registrasi, login, dan pengelolaan akun.
+- Mengelola profile pengguna (nama, foto profile, password)
+- Menyimpan riwayat aktivitas booking apppointment dengan PT/ trainer (baik appointment ongoing maupun yang sudah selesai).
 
-Integrasi: Terkoneksi dengan `Search`, `Wishlist`, dan `Review`, `Place`, `Search`, dan `Hot Deals`.
+Integrasi -> Terkoneksi dengan modul Wishlist, Review, dan Appointment.
 
-### 4. `Wishlist` (Modul Daftar Favorit)  Mengizinkan pengguna untuk menyimpan tempat olahraga favorit mereka agar dapat dengan mudah diakses di kemudian hari.
-Dikerjakan oleh Kanayra Maritza
 
-Fitur Utama:
-* Menyimpan dan menghapus tempat dari wishlist.
-* Menampilkan daftar tempat yang telah disimpan oleh pengguna.
-
-Integrasi: Terkoneksi dengan `Place` dan `Auth & Profile`.
-
-### 5. `Review` (Modul Ulasan dan Rating) Pengguna dapat memberikan rating dan review pada tempat olahraga yang mereka kunjungi untuk membantu pengguna lain dalam memilih tempat terbaik.
-Dikerjakan oleh Dhea Anggrayningsih
+# 🔍 Search (Modul Pencarian)
+-> Memudahkan pengguna mencari tempat olahraga berdasarkan kata kunci dan filter. Dikerjakan oleh Marvel Irawan
 
 Fitur Utama:
-* Memberikan rating (1-5) dan komentar untuk tempat olahraga.
-* Menampilkan review dan rating dari pengguna lain.
-* Admin dapat mengelola review yang tidak sesuai.
-
-Integrasi: Terkoneksi dengan  `Place` dan `Auth & Profile`.
-
-### 6. `Trainer Booking` (Modul Pemesanan Trainer)
-Dikerjakan oleh Kalfin Jefwin
-Fungsi: 
-* Memungkinkan pengguna untuk melihat daftar trainer.
-* Melakukan booking sesi olahraga, dan mengelola jadwal sesi.
-* Admin dapat memonitor dan mengatur booking serta jadwal trainer.
-
-
-# Peran atau aktor pengguna aplikasi
-### Jenis pengguna:
-`User` (biasa) – ditargetkan pada sebagian besar Sport Enthusiast. User ini adalah individu yang tertarik dengan aktivitas olahraga dan ingin menemukan tempat olahraga di sekitar wilayah mereka.
-Mereka butuh referensi tempat yang bervariasi, baik yang berbayar maupun gratis, serta memanfaatkan fitur-fitur berikut untuk memilih lokasi olahraga yang sesuai dengan preferensi mereka, antara lain adalah:
-
-### User biasa
-* Filter berdasarkan cabang olahraga dan lokasi
-* Menyimpan tempat favorit ke wishlist
-* Memberikan review pada tempat olahraga
-* Melihat tempat populer (Trending Coordinates)
-* Melakukan appointment personal trainer/coach
-
-### Admin
-* Menambah daftar lokasi spot olahraga dan personal trainer/coach di Jabodetabek
-* Bisa mengedit dan mendelete lokasi spot olahraga dan personal trainer/coach
-* Cancel appointment PT/coach
+- Pencarian berdasarkan kata kunci.
+- Filter berdasarkan olahraga, lokasi, dan harga (berbayar atau gratis).
+- Menyortir hasil pencarian berdasarkan likes terbanyak.
+  
+Integrasi: Terkoneksi dengan modul Place dan Hot Deals.
 
 
 
-* Penjelasan alur pengintegrasian data di aplikasi dengan aplikasi web (PWS) yang sudah dibuat saat Proyek Tengah Semester berbasis web service.
-* Mengimplementasikan sebuah wrapper class dengan menggunakan library http dan map untuk mendukung penggunaan cookie-based authentication pada aplikasi.
-* Mengimplementasikan REST API pada Django (views.py) dengan menggunakan JsonResponse atau Django JSON Serializer.
-* Mengimplementasikan desain front-end untuk aplikasi berdasarkan desain website yang sudah ada sebelumnya.
+# 🏟️ Place (Modul Tempat Olahraga)
+-> Mengelola data tempat olahraga dan menampilkan rincian informasi tempat seperti fasilitas, deskripsi, lokasi, dan mengintegrasikannya dengan google maps. Dikerjakan oleh Fadhil Daffa
 
-⦁Melakukan integrasi antara front-end dengan back-end dengan menggunakan konsep asynchronous HTTP.
+Fitur Utama:
+- Menyimpan data tempat olahraga (lokasi, fasilitas, deskripsi, harga jika berbayar).
+- Menyediakan peta lokasi google maps.
+- Menampilkan tempat olahraga yang paling populer berdasarkan rating rata-rata.
+- Tempat dengan rating tertinggi akan ditampilkan sebagai Trending Coordinates.
+
+Integrasi: Terkoneksi dengan Search, Wishlist, dan Review, Place, Search, dan Hot Deals.
 
 
 
-- Link Design Figma
-https://www.figma.com/design/nkK1yFNK66zuQtAnYOGL51/PBP-C11-Mobile-Design?node-id=0-1&t=M48Aoct9gydR8JfQ-1
+# ⭐ Wishlist (Modul Daftar Favorit)
+-> Mengizinkan pengguna untuk menyimpan tempat olahraga favorit mereka agar dapat dengan mudah diakses di kemudian hari. Dikerjakan oleh Kanayra Maritza
+
+Fitur Utama:
+- Menyimpan tempat pada card wishlist yang dimana card tersebut bisa diberikan keterangan sesuai preferensi mereka.
+- Meremove daftar tempat yang telah disimpan oleh di card wishlist.
+  
+Integrasi: Terkoneksi dengan Place dan Auth & Profile.
+
+
+# 👍 Review (Modul Ulasan dan Rating)
+-> Pengguna dapat memberikan rating dan review pada tempat olahraga yang mereka kunjungi untuk membantu pengguna lain dalam memilih tempat terbaik namun dengan
+syarat pengguna tersebut harus sudah login.  Dikerjakan oleh Dhea Anggrayningsih
+
+Fitur Utama:
+- Memberikan rating (1-5) dan komentar untuk tempat olahraga.
+- Menampilkan review dan rating dari pengguna lain.
+- Dapat mengelola review yang tidak sesuai (role admin)
+
+Integrasi: Terkoneksi dengan Place dan Auth & Profile.
+
+
+
+# 🏋️‍♂️Trainer Booking (Modul Pemesanan Trainer)
+-> Memungkinkan pengguna untuk melihat daftar trainer yang available di suatu tempat beserta specialities mereka dan melakukan booking sesi olahraga dengan mereka.
+Pengguna juga bisa melihat trainer yang available di jam tertentu.  Dikerjakan oleh Kalfin Jefwin
+
+Fitur utama: 
+- Melihat daftar trainer beserta spesialisasi, rating, dan jadwal tersedia.
+- Memilih tanggal, jam, durasi, dan jenis latihan untuk sesi training.
+- Membuat, mengubah, atau membatalkan booking sesi mereka sendiri.
+- Memberikan review dan rating untuk trainer setelah sesi selesai.
+- Melihat seluruh booking yang dibuat oleh user (admin)
+- Mengatur jadwal trainer (menambah slot baru, mengubah atau menonaktifkan slot) (admin)
+- Membatalkan booking jika ada konflik atau masalah.
+- Memantau dan mengelola review yang diberikan user.
+
+Integrasi Terkoneksi dengan Auth & Profile, Review, Place, dan Search
+
+#  🧩 Integrasi dengan Situs Web 
+- Mengimplementasikan sebuah wrapper class dengan menggunakan library http dan map untuk mendukung penggunaan cookie-based authentication pada aplikasi.
+- Mengimplementasikan REST API pada Django (views.py) dengan menggunakan JsonResponse atau Django JSON Serializer.
+- Mengimplementasikan desain front-end untuk aplikasi berdasarkan desain website yang sudah ada sebelumnya.
+- Melakukan integrasi antara front-end dengan back-end dengan menggunakan konsep asynchronous HTTP.
+
+# 🎨 Link Figma: 
+https://www.figma.com/design/vXSH1mwzy0O4ozmXNNKxCT/FitMatrix?node-id=0-1&t=0LneyTAaBzi1ylCE-1
+password: olahega
+
+
+# 🗃️ Initial dataset: 
+https://huggingface.co/datasets/Shiowo2/Initial-Data-FitMatrix
+https://commons.wikimedia.org/w/index.php?search=lapangan+indonesia&title=Special%3AMediaSearch&type=image WikiMedia, keyword: lapangan Indonesia
+https://commons.wikimedia.org/w/index.php?search=headshot&title=Special%3AMediaSearch&type=image WikiMedia, keyword: headshot (profile trainer)
