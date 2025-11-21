@@ -110,8 +110,7 @@ Integrasi Terkoneksi dengan Auth & Profile, Review, Place, dan Search
 - Melakukan integrasi antara front-end dengan back-end dengan menggunakan konsep asynchronous HTTP.
 
 # 🎨 Link Figma: 
-https://www.figma.com/design/vXSH1mwzy0O4ozmXNNKxCT/FitMatrix?node-id=0-1&t=0LneyTAaBzi1ylCE-1
-password: olahega
+https://www.figma.com/design/nkK1yFNK66zuQtAnYOGL51/PBP-C11-Mobile-Design?node-id=0-1&t=M48Aoct9gydR8JfQ-1
 
 
 # 🗃️ Initial dataset: 
