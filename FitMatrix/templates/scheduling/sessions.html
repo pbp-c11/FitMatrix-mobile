@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Sessions · FitMatrix{% endblock %}
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 pb-24 space-y-12">
+
+  {# === HERO: sama seperti wishlist === #}
+  <header class="matrix-gridline matrix-glass matrix-glow relative overflow-hidden">
+    <div class="matrix-hero-grid"></div>
+    <div class="relative space-y-4 py-10">
+      <p class="matrix-label">Trainer sessions</p>
+      <h1 class="text-4xl sm:text-[3rem] font-semibold leading-tight">Sessions</h1>
+      <p class="text-forest-muted max-w-2xl">
+        Browse live availability across trainers and studios. Filter by trainer name or location to plan your training stack.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a href="{% url 'search:results' %}" class="matrix-btn" data-variant="ghost">Discover more venues</a>
+        <a href="{% url 'wishlist:list' %}" class="matrix-btn" data-variant="ghost">View wishlist</a>
+      </div>
+    </div>
+  </header>
+
+  {# === FILTER BAR (tetap) === #}
+  <form method="get" action="" class="matrix-search-form">
+    <div class="matrix-search-form__field--query">
+      <label for="session-query">Search sessions</label>
+      <input id="session-query" name="q" type="text" value="{{ query }}" class="matrix-input" placeholder="Trainer or place" />
+    </div>
+    <div class="matrix-search-form__field--action">
+      <label>&nbsp;</label>
+      <button type="submit" class="matrix-btn w-full">Filter</button>
+    </div>
+  </form>
+
+  {# === RESULTS TABLE (tetap) === #}
+  <div class="glass card overflow-x-auto">
+    <table class="min-w-full text-sm">
+      <thead class="text-white/70">
+        <tr>
+          <th class="text-left py-2 pr-4">Trainer</th>
+          <th class="text-left py-2 pr-4">Place</th>
+          <th class="text-left py-2 pr-4">Start</th>
+          <th class="text-left py-2 pr-4">Seats left</th>
+          <th class="text-left py-2 pr-4">Action</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-white/10">
+        {% for slot in slots %}
+          <tr class="hover:bg-white/5">
+            <td class="py-3 pr-4">
+              <div class="flex flex-col">
+                <span class="font-semibold">{{ slot.trainer.name }}</span>
+                <span class="text-xs text-white/60">{{ slot.trainer.specialties }}</span>
+              </div>
+            </td>
+            <td class="py-3 pr-4">
+              <div class="flex flex-col">
+                <span>{{ slot.place.name }}</span>
+                <span class="text-xs text-white/60">{{ slot.place.city }}</span>
+              </div>
+            </td>
+            <td class="py-3 pr-4">{{ slot.start|date:"M d, Y" }} · {{ slot.start|date:"H:i" }}</td>
+            <td class="py-3 pr-4">{{ slot.seats_left }} seats</td>
+            <td class="py-3 pr-4">
+              {% if request.user.is_authenticated %}
+                <form method="post" action="{% url 'scheduling:booking-create' slot.pk %}" class="inline">
+                  {% csrf_token %}
+                  <input type="hidden" name="slot" value="{{ slot.pk }}" />
+                  {% if slot.pk in booked_slot_ids %}
+                    <span class="matrix-pill">Booked</span>
+                  {% else %}
+                    <button type="submit" class="matrix-btn" data-variant="ghost">Book slot</button>
+                  {% endif %}
+                </form>
+              {% else %}
+                <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="matrix-btn" data-variant="ghost">Login to book</a>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="5" class="py-6 text-center text-white/70">No active sessions right now. Check back soon.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</section>
+{% endblock %}

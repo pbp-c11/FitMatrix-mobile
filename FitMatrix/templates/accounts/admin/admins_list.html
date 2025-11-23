@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Manage admins · FitMatrix{% endblock %}
+{% block content %}
+<section class="max-w-[1200px] mx-auto px-4 sm:px-6 py-12 space-y-8">
+  {% include "accounts/admin/_nav.html" %}
+  <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+    <div class="glass card space-y-6">
+      <div>
+        <h1 class="text-2xl font-semibold">Add an admin</h1>
+        <p class="text-sm text-white/70">Create a new administrator account with dashboard access.</p>
+      </div>
+      <form method="post" novalidate class="space-y-4">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+          <div class="alert alert-error" role="alert">
+            {% for error in form.non_field_errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
+        {% for field in form %}
+          <div class="space-y-1">
+            <label for="{{ field.id_for_label }}" class="block text-sm font-medium">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+              <div class="text-xs text-white/60">{{ field.help_text|safe }}</div>
+            {% endif %}
+            {% if field.errors %}
+              <ul class="text-sm text-red-300">
+                {% for error in field.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        {% endfor %}
+        <button type="submit" class="btn-primary">Create admin</button>
+      </form>
+    </div>
+    <div class="space-y-4">
+      <div class="flex items-center justify-between gap-2">
+        <h2 class="text-2xl font-semibold">Current admins</h2>
+        <p class="text-sm text-white/60">{{ admins|length }} total</p>
+      </div>
+      <div class="glass divide-y divide-white/10 rounded-xl overflow-hidden">
+        {% if admins %}
+          <ul role="list" class="divide-y divide-white/10">
+            {% for admin in admins %}
+              <li class="px-4 py-3 flex items-center justify-between gap-4">
+                <div>
+                  <p class="font-medium">{{ admin.display_name|default:admin.username }}</p>
+                  <p class="text-sm text-white/60">{{ admin.email }}</p>
+                </div>
+                {% if admin.last_login %}
+                  <p class="text-xs text-white/50">Last active {{ admin.last_login|naturaltime }}</p>
+                {% else %}
+                  <p class="text-xs text-white/50">Never logged in</p>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="px-4 py-6 text-sm text-white/70">No admin accounts found.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

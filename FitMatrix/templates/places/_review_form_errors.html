@@ -1,0 +1,9 @@
+{% if form.errors %}
+  <div class="bg-rose-100 border border-rose-300 text-rose-800 text-sm p-3 rounded-lg space-y-1">
+    {% for field, errors in form.errors.items %}
+      {% for error in errors %}
+        <p><strong>{{ field|capfirst }}:</strong> {{ error }}</p>
+      {% endfor %}
+    {% endfor %}
+  </div>
+{% endif %}

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
+  <defs>
+    <linearGradient id="gradAqua" x1="0%" x2="0%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#0f7ad1" />
+      <stop offset="100%" stop-color="#0de0d0" />
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#gradAqua)" rx="36" />
+  <path d="M40 220 Q120 160 200 220 T360 220 T520 220 T600 220" stroke="#ffffff" stroke-width="18" fill="none" opacity="0.9" />
+  <path d="M40 280 Q120 220 200 280 T360 280 T520 280 T600 280" stroke="#e8ffff" stroke-width="14" fill="none" opacity="0.8" />
+  <text x="54" y="96" font-family="'Montserrat', sans-serif" font-size="54" font-weight="700" fill="#ffffff">Tidal Flow</text>
+  <text x="56" y="142" font-family="'Montserrat', sans-serif" font-size="28" fill="#d8ffff" opacity="0.9">Aquatic endurance &amp; recovery</text>
+</svg>

@@ -1,0 +1,59 @@
+{% comment %}
+Reusable card grid for Place objects.
+Usage example:
+  {% include "_cards.html" with places=<queryset> %}
+{% endcomment %}
+
+{% load static %}
+{% for place in places %}
+  <article class="rounded-[35px] border border-black/10 shadow-sm overflow-hidden bg-gradient-to-tr from-[#FDFEFD] to-[#F0FDF4]">
+    <a href="{% url 'places:detail' place.slug %}" class="block relative">
+      {% with img=place.main_image|default:place.hero_image %}
+        {% if img %}
+          {% if img.url %}
+            <img src="{{ img.url }}" alt="{{ place.name }}" class="w-full h-48 object-cover" />
+          {% else %}
+            <img src="{% if img and '://' in img %}{{ img }}{% else %}{% static img %}{% endif %}"
+                 alt="{{ place.name }}" class="w-full h-48 object-cover" />
+          {% endif %}
+        {% else %}
+          <img src="https://placehold.co/642x361" alt="{{ place.name }}" class="w-full h-48 object-cover" />
+        {% endif %}
+      {% endwith %}
+      <span class="absolute left-4 top-4 px-4 py-1.5 rounded-full border-2 border-[#2C7F4F] bg-white/80 font-[Koulen] text-xs tracking-[0.25em]">
+        {{ place.facility_type|default:"GYM" }}
+      </span>
+    </a>
+
+    <div class="p-6 space-y-3">
+      <div class="flex items-center flex-wrap gap-x-4 gap-y-1 text-[#0D5821]/70 text-[13.5px]">
+        <span>{{ place.city|default:"" }}</span>
+        <span class="hidden sm:inline">&#8226;</span>
+        <span>{{ place.price_display|default:"Pricing on request" }}</span>
+        <span class="hidden sm:inline">&#8226;</span>
+        <span>Rating {{ place.rating_avg|default_if_none:"0.0"|floatformat:1 }}</span>
+      </div>
+
+      <a href="{% url 'places:detail' place.slug %}">
+        <h3 class="text-[#0D5821] font-['Palanquin Dark'] text-[22px] md:text-[24px] leading-snug">
+          {{ place.name }}
+        </h3>
+      </a>
+
+      <p class="text-black/70 text-[14.5px] leading-relaxed line-clamp-2">
+        {{ place.summary|default:place.tagline|default:"Premium multi-zone facility." }}
+      </p>
+
+      <div class="pt-2 flex flex-wrap gap-2">
+        <a href="{% url 'places:detail' place.slug %}" class="matrix-btn" data-variant="ghost">View Space</a>
+        {% if place.google_maps_url %}
+          <a href="{{ place.google_maps_url }}" target="_blank" rel="noopener noreferrer" class="matrix-btn" data-variant="ghost">
+            View on Map
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </article>
+{% empty %}
+  <p class="text-[#032304]/70">No places to show.</p>
+{% endfor %}
