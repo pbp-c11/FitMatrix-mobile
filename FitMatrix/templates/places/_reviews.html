@@ -1,0 +1,109 @@
+<section class="mt-10 md:col-span-2">
+  <h2 class="text-2xl font-semibold text-[#0E3A22] mb-6">Member Reviews</h2>
+
+  <!-- Reviews container -->
+  <div id="reviews-container">
+    {% for review in reviews %}
+      <div class="w-full rounded-2xl bg-white/80 border border-[#C9FFD4] shadow-sm p-5 mb-4">
+        <div class="flex justify-between items-center mb-1">
+          <p class="font-semibold text-[#12391E]">@{{ review.user.username }}</p>
+          <span class="text-xs text-gray-500">{{ review.created_at|date:"d M Y, H:i" }}</span>
+        </div>
+        <p class="text-sm text-[#497D5E] mb-2 leading-relaxed">{{ review.body }}</p>
+        <p class="text-xs text-[#315739]">Rating: {{ review.rating }}/5</p>
+      </div>
+    {% empty %}
+      <p class="text-gray-500 text-center">No reviews yet.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Review form -->
+  {% if request.user.is_authenticated %}
+  <form id="reviewForm"
+        method="post"
+        action="{% url 'places:place_review_create' slug=place.slug %}"
+        class="mt-8 bg-white/70 border border-[#C9FFD4] rounded-2xl p-5 shadow-sm">
+    {% csrf_token %}
+    <h3 class="text-lg font-semibold text-[#12391E] mb-3">Leave a Review</h3>
+
+    <div class="space-y-4">
+      <div>
+        <label class="text-sm text-[#315739] font-medium mb-1 block">Your Review</label>
+        <textarea name="body" rows="3" required
+          class="w-full border border-[#A5E1A2] rounded-xl p-3 text-sm focus:ring-2 focus:ring-emerald-300"
+          placeholder="Write your feedback here..."></textarea>
+      </div>
+
+      <div>
+        <label class="text-sm text-[#315739] font-medium mb-1 block">Rating</label>
+        <select name="rating" required
+          class="w-full border border-[#A5E1A2] rounded-xl p-2 text-sm">
+          <option value="">Select rating</option>
+          <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+          <option value="4">⭐⭐⭐⭐ Good</option>
+          <option value="3">⭐⭐⭐ Average</option>
+          <option value="2">⭐⭐ Poor</option>
+          <option value="1">⭐ Terrible</option>
+        </select>
+      </div>
+
+      <button type="submit"
+        class="w-full py-2 rounded-full bg-gradient-to-r from-[#8EEA6E] to-[#5DD65B] text-[#0B2A12] font-semibold hover:brightness-105 transition-all">
+        Submit Review
+      </button>
+    </div>
+  </form>
+  {% else %}
+  <p class="text-sm text-[#497D5E] mt-6">
+    <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="text-emerald-700 underline font-medium">Login</a>
+    to leave a review.
+  </p>
+  {% endif %}
+</section>
+
+<!-- JS -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector("#reviewForm");
+  const container = document.querySelector("#reviews-container");
+
+  if (!form) return;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const csrftoken = form.querySelector("[name=csrfmiddlewaretoken]").value;
+    const submitBtn = form.querySelector("button[type='submit']");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Submitting...";
+
+    try {
+      const res = await fetch(form.action, {
+        method: "POST",
+        headers: { "X-CSRFToken": csrftoken, "X-Requested-With": "XMLHttpRequest" },
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Server error");
+      const data = await res.json();
+
+      if (data.success && data.html) {
+        // prepend new review to top
+        container.insertAdjacentHTML("afterbegin", data.html);
+        form.reset();
+      } else if (data.errors) {
+        alert("Please fill all required fields.");
+      } else {
+        alert("Failed to submit review. Try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to submit review. Try again.");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Review";
+    }
+  });
+});
+</script>

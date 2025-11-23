@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Wishlist Collections | FitMatrix{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-6 py-12 space-y-10">
+
+  <h1 class="text-3xl font-bold text-forest text-center">Wishlist Collections</h1>
+
+  {% if collections %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-8">
+      {% for c in collections %}
+      <div class="relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 p-8 h-72 border border-gray-100 group">
+
+        <!-- Tombol delete -->
+        <button
+          type="button"
+          class="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-md z-10"
+          data-id="{{ c.id }}"
+          data-name="{{ c.name|escapejs }}"
+          onclick="confirmDelete(this, event)">
+          Delete
+        </button>
+
+        <!-- Card link -->
+        <a href="{% url 'accounts:wishlist-collection-detail' c.id %}" class="block h-full">
+          <div class="flex flex-col justify-between h-full">
+            <div>
+              <h2 class="text-2xl font-semibold mb-2 truncate">{{ c.name }}</h2>
+              <p class="text-gray-500 text-base mb-3 truncate">{{ c.description|default:"No description" }}</p>
+            </div>
+            <div class="flex items-center justify-between text-gray-400 text-sm">
+              <p>{{ c.items.count }} place{{ c.items.count|pluralize }}</p>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                   class="w-8 h-8 opacity-10 group-hover:opacity-25 transition text-green-700"
+                   viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 
+                         2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 
+                         4.5 2.09C13.09 3.81 14.76 3 
+                         16.5 3 19.58 3 22 5.42 22 
+                         8.5c0 3.78-3.4 6.86-8.55 
+                         11.54L12 21.35z"/>
+              </svg>
+            </div>
+          </div>
+        </a>
+
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-gray-500 text-center py-10 bg-white rounded-2xl border border-gray-100 shadow">
+      You have no wishlist collections yet.
+    </p>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<div id="toastContainer" class="fixed bottom-6 right-6 space-y-2 z-50"></div>
+
+<script>
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      cookie = cookie.trim();
+      if (cookie.startsWith(name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `px-4 py-3 rounded-xl shadow-lg text-white ${
+    type === 'error' ? 'bg-red-500' : 'bg-green-500'
+  }`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('opacity-0', 'translate-y-2');
+    setTimeout(() => toast.remove(), 400);
+  }, 3000);
+}
+
+function openConfirmModal(message, onConfirm) {
+  const modal = document.createElement('div');
+  modal.className = "fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50";
+  modal.innerHTML = `
+    <div class="bg-white rounded-2xl p-6 w-[360px] text-center space-y-4 shadow-lg border border-gray-100">
+      <p class="text-gray-800">${message}</p>
+      <div class="flex justify-center gap-4 mt-4">
+        <button id="cancelBtn" class="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">
+          Cancel
+        </button>
+        <button id="confirmBtn" class="px-5 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600">
+          Delete
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  modal.querySelector('#cancelBtn').addEventListener('click', () => modal.remove());
+  modal.querySelector('#confirmBtn').addEventListener('click', () => {
+    modal.remove();
+    onConfirm();
+  });
+}
+
+function confirmDelete(btn, event) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const id = btn.dataset.id;
+  const name = btn.dataset.name;
+
+  openConfirmModal(`Remove "${name}" and all items inside it?`, () => {
+    fetch(`/accounts/wishlist/collections/${id}/delete/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === "deleted") {
+        const card = btn.closest('.relative');
+        card.style.transition = "opacity .3s, transform .3s";
+        card.style.opacity = 0;
+        card.style.transform = "scale(0.95)";
+        setTimeout(() => card.remove(), 300);
+        showToast(`Collection "${name}" deleted`);
+      } else {
+        showToast("Failed to delete collection.", "error");
+      }
+    })
+    .catch(() => showToast("Network error.", "error"));
+  });
+}
+</script>
+{% endblock %}

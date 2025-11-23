@@ -1,0 +1,201 @@
+[
+  {
+    "model": "places.place",
+    "pk": 1,
+    "fields": {
+      "name": "Axis Performance Lab",
+      "slug": "axis-performance-lab",
+      "tagline": "Strength and conditioning lab engineered for multi-sport athletes.",
+      "summary": "Daily programming across Olympic lifting, plyometrics, and metabolic circuits. Integrated recovery and data tracking keep each block efficient.",
+      "tags": "strength,conditioning,performance,recovery",
+      "address": "Jl. Sisingamangaraja No. 12",
+      "city": "Jakarta Selatan",
+      "facility_type": "GYM",
+      "amenities": [
+        "Athlete lounge",
+        "Performance testing",
+        "Strength circuits",
+        "Recovery ice bath"
+      ],
+      "highlight_score": 9,
+      "accent_color": "#03B863",
+      "hero_image": "media/hero-athlete.jpg",
+      "gallery": [
+        "media/aqua-circuit.jpg",
+        "media/studio-flow.jpg",
+        "media/outdoor-matrix.jpg"
+      ],
+      "is_free": false,
+      "price": "250000.00",
+      "rating_avg": 4.8,
+      "likes": 186,
+      "is_active": true,
+      "created_at": "2024-06-15T10:00:00Z"
+    }
+  },
+  {
+    "model": "places.place",
+    "pk": 2,
+    "fields": {
+      "name": "Pulse 38 HIIT Grid",
+      "slug": "pulse-38-hiit-grid",
+      "tagline": "High-energy HIIT grid with live leaderboards and synced lighting.",
+      "summary": "Sweat-powered HIIT pods, sled tracks, and velocity-based strength coaching. Recharge at the salt therapy bar post session.",
+      "tags": "hiit,cardio,lighting",
+      "address": "Jl. Senopati No. 38",
+      "city": "Jakarta Selatan",
+      "facility_type": "STUDIO",
+      "amenities": [
+        "Velocity based training",
+        "Infrared sauna",
+        "Salt therapy bar",
+        "Live leaderboard"
+      ],
+      "highlight_score": 8,
+      "accent_color": "#7FEB45",
+      "hero_image": "media/studio-flow.jpg",
+      "gallery": [
+        "media/studio-flow.jpg",
+        "media/hero-athlete.jpg"
+      ],
+      "is_free": false,
+      "price": "180000.00",
+      "rating_avg": 4.6,
+      "likes": 142,
+      "is_active": true,
+      "created_at": "2024-07-07T07:30:00Z"
+    }
+  },
+  {
+    "model": "places.place",
+    "pk": 3,
+    "fields": {
+      "name": "HydroSync Aquatics",
+      "slug": "hydrosync-aquatics",
+      "tagline": "Olympic-size hydro training hub with recovery plunge labs.",
+      "summary": "From triathlon tempo sessions to underwater treadmills, HydroSync anchors aquatic conditioning with immediate hot and cold therapy anchors.",
+      "tags": "swim,triathlon,recovery",
+      "address": "Jl. Gatot Subroto Kav. 8",
+      "city": "Jakarta Selatan",
+      "facility_type": "SWIM",
+      "amenities": [
+        "50m Olympic pool",
+        "Underwater treadmill",
+        "Cold plunge suite",
+        "Triathlon lockers"
+      ],
+      "highlight_score": 10,
+      "accent_color": "#08BDBA",
+      "hero_image": "media/aqua-circuit.jpg",
+      "gallery": [
+        "media/aqua-circuit.jpg",
+        "media/outdoor-matrix.jpg"
+      ],
+      "is_free": false,
+      "price": "320000.00",
+      "rating_avg": 4.9,
+      "likes": 212,
+      "is_active": true,
+      "created_at": "2024-05-22T09:00:00Z"
+    }
+  },
+  {
+    "model": "places.place",
+    "pk": 4,
+    "fields": {
+      "name": "Fieldline Outdoor Arena",
+      "slug": "fieldline-outdoor-arena",
+      "tagline": "Modular outdoor arena for hybrid bootcamps and functional rigs.",
+      "summary": "Sunrise calisthenics, evening conditioning circuits, and weekend endurance labs across a configurable outdoor grid with weather-resistant rigs.",
+      "tags": "outdoor,bootcamp,functional",
+      "address": "Jl. Pangeran Antasari No. 88",
+      "city": "Jakarta Selatan",
+      "facility_type": "OUTDOOR",
+      "amenities": [
+        "Turf sprint lanes",
+        "Climbing rigs",
+        "Outdoor ice baths",
+        "Night lighting"
+      ],
+      "highlight_score": 7,
+      "accent_color": "#0AAE5A",
+      "hero_image": "media/outdoor-matrix.jpg",
+      "gallery": [
+        "media/outdoor-matrix.jpg",
+        "media/hero-athlete.jpg"
+      ],
+      "is_free": true,
+      "price": null,
+      "rating_avg": 4.4,
+      "likes": 95,
+      "is_active": true,
+      "created_at": "2024-08-02T06:00:00Z"
+    }
+  },
+  {
+    "model": "places.place",
+    "pk": 5,
+    "fields": {
+      "name": "BreatheSync Recovery Lounge",
+      "slug": "breathesync-recovery-lounge",
+      "tagline": "Guided breathwork, cold plunges, and light therapy recovery pods.",
+      "summary": "Downshift post-training with contrast therapy, red light suites, and guided breath sessions. Tailored protocols ensure consistent reset days.",
+      "tags": "recovery,breathwork,wellness",
+      "address": "Jl. Wijaya II No. 45",
+      "city": "Jakarta Selatan",
+      "facility_type": "WELLNESS",
+      "amenities": [
+        "Guided breathwork",
+        "Light therapy pods",
+        "Contrast showers",
+        "Herbal lounge"
+      ],
+      "highlight_score": 8,
+      "accent_color": "#16C79A",
+      "hero_image": "media/recovery-lounge.jpg",
+      "gallery": [
+        "media/recovery-lounge.jpg",
+        "media/aqua-circuit.jpg"
+      ],
+      "is_free": false,
+      "price": "220000.00",
+      "rating_avg": 4.7,
+      "likes": 128,
+      "is_active": true,
+      "created_at": "2024-09-12T11:45:00Z"
+    }
+  },
+  {
+    "model": "places.place",
+    "pk": 6,
+    "fields": {
+      "name": "CourtCore Arena",
+      "slug": "courtcore-arena",
+      "tagline": "Premium court complex for futsal, basketball, and combat conditioning.",
+      "summary": "Switch between futsal courts, boxing rings, and mobility corners. Integrated booking ensures frictionless team rotations and skill drills.",
+      "tags": "court,futsal,boxing",
+      "address": "Jl. Kelapa Nias Raya Blok QA6",
+      "city": "Jakarta Utara",
+      "facility_type": "COURT",
+      "amenities": [
+        "Futsal arena",
+        "Boxing ring",
+        "Mobility zone",
+        "locker lounge"
+      ],
+      "highlight_score": 6,
+      "accent_color": "#03A688",
+      "hero_image": "media/studio-flow.jpg",
+      "gallery": [
+        "media/hero-athlete.jpg",
+        "media/outdoor-matrix.jpg"
+      ],
+      "is_free": false,
+      "price": "200000.00",
+      "rating_avg": 4.5,
+      "likes": 104,
+      "is_active": true,
+      "created_at": "2024-07-28T08:20:00Z"
+    }
+  }
+]

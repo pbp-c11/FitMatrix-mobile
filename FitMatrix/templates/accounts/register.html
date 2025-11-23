@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Create account · FitMatrix{% endblock %}
+{% block content %}
+<section class="max-w-[1200px] mx-auto px-4 sm:px-6 min-h-[calc(100vh-64px)] grid place-items-center">
+  <div class="glass card w-full max-w-[420px] animate-in">
+    <div class="text-center space-y-2">
+      <span class="text-sm uppercase tracking-[0.35em] text-white/60">FitMatrix</span>
+      <h1 class="text-3xl font-bold">Create your account</h1>
+      <p class="text-white/70 text-sm">Join the community and start planning your training journey.</p>
+    </div>
+    <form method="post" enctype="multipart/form-data" class="mt-6 space-y-4">
+      {% csrf_token %}
+      <div class="space-y-1 animate-in delay-1">
+        <label for="id_username" class="text-sm font-medium">Username</label>
+        <input type="text" name="username" id="id_username" value="{{ form.username.value|default:'' }}" class="input" autocomplete="username" aria-invalid="{{ form.username.errors|yesno:'true,false' }}" required />
+        {% for error in form.username.errors %}<p class="text-rose-300 text-sm">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="space-y-1 animate-in delay-2">
+        <label for="id_email" class="text-sm font-medium">Email</label>
+        <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}" class="input" autocomplete="email" aria-invalid="{{ form.email.errors|yesno:'true,false' }}" required />
+        {% for error in form.email.errors %}<p class="text-rose-300 text-sm">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="space-y-1 animate-in delay-2">
+        <label for="id_display_name" class="text-sm font-medium">Display name</label>
+        <input type="text" name="display_name" id="id_display_name" value="{{ form.display_name.value|default:'' }}" class="input" />
+      </div>
+      <div class="space-y-1 animate-in delay-3">
+        <label for="id_password1" class="text-sm font-medium">Password</label>
+        <input type="password" name="password1" id="id_password1" class="input" autocomplete="new-password" aria-invalid="{{ form.password1.errors|yesno:'true,false' }}" required />
+        {% for error in form.password1.errors %}<p class="text-rose-300 text-sm">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="space-y-1 animate-in delay-3">
+        <label for="id_password2" class="text-sm font-medium">Confirm password</label>
+        <input type="password" name="password2" id="id_password2" class="input" autocomplete="new-password" aria-invalid="{{ form.password2.errors|yesno:'true,false' }}" required />
+        {% for error in form.password2.errors %}<p class="text-rose-300 text-sm">{{ error }}</p>{% endfor %}
+      </div>
+      <div class="space-y-1 animate-in delay-3">
+        <label for="id_avatar" class="text-sm font-medium">Avatar (PNG/JPG, max 2MB)</label>
+        <input type="file" name="avatar" id="id_avatar" class="input" accept="image/png,image/jpeg" />
+        {% for error in form.avatar.errors %}<p class="text-rose-300 text-sm">{{ error }}</p>{% endfor %}
+      </div>
+      {% if form.non_field_errors %}
+        <div class="bg-rose-500/20 border border-rose-500/40 text-rose-100 text-sm p-3 rounded-lg">
+          {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+        </div>
+      {% endif %}
+      <button type="submit" class="btn-primary w-full animate-in delay-4">Create account</button>
+    </form>
+    <p class="mt-6 text-sm text-center text-white/70">Already have an account? <a href="{% url 'accounts:login' %}" class="text-[var(--green-300)] hover:text-[var(--green-200)]">Sign in</a></p>
+  </div>
+</section>
+{% endblock %}
