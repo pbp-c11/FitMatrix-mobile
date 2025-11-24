@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Search FitMatrix spaces{% endblock %}
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 pb-24 space-y-16">
+  <header class="matrix-gridline matrix-glass matrix-glow relative overflow-hidden">
+    <div class="matrix-hero-grid"></div>
+    <div class="relative space-y-6 py-10">
+      <p class="matrix-label">Discover the network</p>
+      <h1 class="text-4xl sm:text-[3rem] font-semibold leading-tight max-w-3xl">
+        Search gyms, studios, pools, and recovery labs tuned to your training flow.
+      </h1>
+      <p class="text-forest-muted max-w-2xl">
+        Filter by sport modality, neighbourhood, pricing bands, and amenities. FitMatrix synthesises your perfect combination of performance and recovery spaces.
+      </p>
+    </div>
+  </header>
+
+  <form method="get" action="{% url 'search:results' %}" class="matrix-search-form" data-async-search>
+    <input type="hidden" name="type" value="{{ selected_type|lower }}" />
+    <input type="hidden" name="price" value="{{ selected_price }}" />
+    <div class="matrix-search-form__field--query">
+      <label for="query">Keyword</label>
+      <input class="matrix-input" type="text" name="q" id="query" placeholder="Search by name, neighborhood, or vibe" value="{{ query }}" />
+    </div>
+    <div class="matrix-search-form__field--city">
+      <label for="city">City</label>
+      <input class="matrix-input" type="text" name="city" id="city" placeholder="e.g. Jakarta Selatan" value="{{ city }}" />
+    </div>
+    <div class="matrix-search-form__field--price">
+      <label for="price">Price Tier</label>
+      <select class="matrix-input" name="price" id="price">
+        <option value="" {% if not selected_price %}selected{% endif %}>Any</option>
+        {% for key, label in price_filters %}
+          <option value="{{ key }}" {% if selected_price == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="matrix-search-form__field--action">
+      <label>&nbsp;</label>
+      <button type="submit" class="matrix-btn w-full">Refine</button>
+    </div>
+  </form>
+
+  <section class="space-y-6">
+
+    <div class="flex flex-wrap items-center gap-4">
+      <p class="matrix-meta-label">Results</p>
+      <p class="matrix-meta-value"><span data-search-count>{{ places|length }}</span> spaces aligned</p>
+      {% if selected_amenities %}
+        <div class="matrix-pill-group">
+          {% for amenity in selected_amenities %}
+            <span class="matrix-pill">{{ amenity }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="matrix-grid" data-search-results>
+      {% include "search/_cards.html" %}
+    </div>
+  </section>
+
+
+  <section class="space-y-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <h2 class="matrix-section-title">Recommended for you</h2>
+      <span class="matrix-meta-label">Curated from your browsing</span>
+    </div>
+    <div class="matrix-grid">
+      {% for place in recommended %}
+        <article class="matrix-card" data-variant="ghost">
+          <div class="matrix-card__body">
+            <div class="matrix-card__meta">
+              <span>{{ place.city }}</span>
+              <span>{{ place.facility_type }}</span>
+              <span>{{ place.rating_avg|floatformat:1 }} ★</span>
+            </div>
+            <h3 class="matrix-card__title">{{ place.name }}</h3>
+            <p class="text-forest-muted text-sm">{{ place.summary|truncatewords:18 }}</p>
+            <div class="flex flex-wrap items-center gap-3 justify-between">
+              <span class="matrix-price-tag">
+                {{ place.price_display }}
+                <span>per session</span>
+              </span>
+              <a href="{{ place.get_absolute_url }}" class="matrix-btn" data-variant="ghost">Details</a>
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <div class="matrix-empty-state">
+          <h3>No recommendations yet</h3>
+          <p>Interact with venues and trainers to tailor our neural recommendations.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+</section>
+{% endblock %}

@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Profile · FitMatrix{% endblock %}
+{% block content %}
+<section class="max-w-[1200px] mx-auto px-4 sm:px-6 py-12 space-y-8">
+  <div class="glass card flex flex-col md:flex-row md:items-center md:justify-between gap-6 animate-in">
+    <div class="flex items-center gap-6">
+      <div class="relative">
+        <div class="w-24 h-24 rounded-full overflow-hidden ring-4 ring-[var(--emerald)]">
+          {% if request.user.avatar %}
+            <img src="{{ request.user.avatar.url }}" alt="{{ request.user.display_name }} avatar" class="w-full h-full object-cover" />
+          {% else %}
+            <div class="w-full h-full bg-white/10 grid place-items-center text-3xl font-bold">{{ request.user.username|slice:":2"|upper }}</div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="space-y-1">
+        <h2 class="text-2xl font-semibold drop-shadow">{{ request.user.display_name }}</h2>
+        <p class="text-white/70">{{ request.user.email }}</p>
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold {% if request.user.is_admin %}bg-[var(--emerald)] text-black{% else %}bg-[var(--mint)] text-black{% endif %}">
+          {% if request.user.is_admin %}ADMIN{% else %}USER{% endif %}
+        </span>
+      </div>
+    </div>
+    <form method="post" action="{% url 'accounts:logout' %}" class="self-start md:self-auto">
+      {% csrf_token %}
+      <button type="submit" class="matrix-btn" data-variant="danger">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6A2.25 2.25 0 005.25 5.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M18 12H9m0 0l2.25-2.25M9 12l2.25 2.25" />
+        </svg>
+        <span>Log out</span>
+      </button>
+    </form>
+  </div>
+  <div class="md:grid md:grid-cols-3 gap-6">
+    <nav class="glass card space-y-2 md:sticky md:top-20 h-fit">
+      <a href="#account" class="block px-3 py-2 rounded-xl hover:bg-white/10">Account</a>
+      <a href="#security" class="block px-3 py-2 rounded-xl hover:bg-white/10">Security</a>
+      <a href="#history" class="block px-3 py-2 rounded-xl hover:bg-white/10">History</a>
+      <a href="#wishlist" class="block px-3 py-2 rounded-xl hover:bg-white/10">Wishlist</a>
+    </nav>
+    <div class="md:col-span-2 space-y-8">
+      <section id="account" class="glass card space-y-6">
+        <div>
+          <h3 class="text-xl font-semibold">Account</h3>
+          <p class="text-sm text-white/70">Update your contact details and avatar.</p>
+        </div>
+        <form method="post" action="{% url 'accounts:profile-edit' %}" enctype="multipart/form-data" class="space-y-4" id="profile-form">
+          {% csrf_token %}
+          {% if profile_form.non_field_errors %}
+            <div class="bg-rose-500/20 border border-rose-500/40 text-rose-100 text-sm p-3 rounded-lg">
+              {% for error in profile_form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+            </div>
+          {% endif %}
+          <div>
+            <label for="id_display_name" class="block text-sm font-medium">Display name</label>
+            {{ profile_form.display_name }}
+            {% for error in profile_form.display_name.errors %}<p class="text-rose-300 text-sm">{{ error }}</p>{% endfor %}
+          </div>
+          <div>
+            <label for="id_email" class="block text-sm font-medium">Email</label>
+            {{ profile_form.email }}
+            {% for error in profile_form.email.errors %}<p class="text-rose-300 text-sm">{{ error }}</p>{% endfor %}
+          </div>
+          <div>
+            <label for="id_avatar" class="block text-sm font-medium">Avatar</label>
+            <div class="flex flex-col sm:flex-row gap-4 items-start">
+              <div class="w-20 h-20 rounded-full overflow-hidden bg-white/10" id="avatar-preview">
+                {% if request.user.avatar %}
+                  <img src="{{ request.user.avatar.url }}" alt="Current avatar" class="w-full h-full object-cover" />
+                {% else %}
+                  <div class="w-full h-full grid place-items-center text-lg text-white/70">Preview</div>
+                {% endif %}
+              </div>
+              <div class="flex-1">
+                {{ profile_form.avatar }}
+                <p class="text-xs text-white/60 mt-1">PNG or JPG up to 2MB.</p>
+                {% for error in profile_form.avatar.errors %}<p class="text-rose-300 text-sm">{{ error }}</p>{% endfor %}
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">Save changes</button>
+        </form>
+      </section>
+      <section id="security" class="glass card space-y-6">
+        <div>
+          <h3 class="text-xl font-semibold">Security</h3>
+          <p class="text-sm text-white/70">Choose a strong password to protect your account.</p>
+        </div>
+        <form method="post" action="{% url 'accounts:password' %}" class="space-y-4">
+          {% csrf_token %}
+          <div>
+            <label for="id_old_password" class="block text-sm font-medium">Current password</label>
+            {{ password_form.old_password }}
+          </div>
+          <div>
+            <label for="id_new_password1" class="block text-sm font-medium">New password</label>
+            {{ password_form.new_password1 }}
+          </div>
+          <div>
+            <label for="id_new_password2" class="block text-sm font-medium">Confirm new password</label>
+            {{ password_form.new_password2 }}
+          </div>
+          <button type="submit" class="btn-primary">Update password</button>
+        </form>
+      </section>
+      <section id="history" class="glass card space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h3 class="text-xl font-semibold">History</h3>
+            <p class="text-sm text-white/70">Track your activities and sessions.</p>
+          </div>
+          {% if current_booking %}
+            <span class="px-4 py-2 rounded-xl bg-white/20 text-sm">Current: {{ current_booking.slot.trainer.name }} · {{ current_booking.slot.start|date:"M d, H:i" }}</span>
+          {% endif %}
+        </div>
+        <div class="space-y-4">
+          <h4 class="text-lg font-semibold">Past Appointments</h4>
+          {% if past_bookings %}
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm">
+                <thead class="text-white/70">
+                  <tr>
+                    <th class="text-left py-2 pr-4">Date</th>
+                    <th class="text-left py-2 pr-4">Trainer</th>
+                    <th class="text-left py-2 pr-4">Place</th>
+                    <th class="text-left py-2">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/10">
+                  {% for booking in past_bookings %}
+                    <tr class="hover:bg-white/5">
+                      <td class="py-2 pr-4">{{ booking.slot.start|date:"M d, Y H:i" }}</td>
+                      <td class="py-2 pr-4">{{ booking.slot.trainer.name }}</td>
+                      <td class="py-2 pr-4">{{ booking.slot.place.name }}</td>
+                      <td class="py-2">{{ booking.get_status_display }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center text-white/70 py-10">
+              <p>No past appointments yet.</p>
+              <a href="{% url 'search:results' %}" class="text-[var(--green-300)] hover:text-[var(--green-200)]">Browse places</a>
+            </div>
+          {% endif %}
+        </div>
+        <div class="space-y-4">
+          <h4 class="text-lg font-semibold">Activity Log</h4>
+          {% if activity_page %}
+            <ul class="space-y-2">
+              {% for activity in activity_page %}
+                <li class="glass px-3 py-2 bg-white/5 flex items-center justify-between">
+                  <span class="text-sm">{{ activity.get_type_display }}</span>
+                  <span class="text-xs text-white/60">{{ activity.created_at|naturaltime }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+            {% include "components/paginator.html" with page_obj=activity_page %}
+          {% else %}
+            <p class="text-white/60">No activity yet.</p>
+          {% endif %}
+        </div>
+      </section>
+      <section id="wishlist" class="glass card space-y-6">
+        <div>
+          <h3 class="text-xl font-semibold">Wishlist</h3>
+          <p class="text-sm text-white/70">Places and trainers you love.</p>
+        </div>
+        {% if wishlist_page.object_list %}
+          <div class="grid sm:grid-cols-2 gap-4" id="wishlist-grid">
+            {% for item in wishlist_page %}
+              <article class="glass p-4 bg-white/5 flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                  <h5 class="font-semibold">{% if item.place %}{{ item.place.name }}{% else %}{{ item.trainer.name }}{% endif %}</h5>
+                  <button
+                    type="button"
+                    class="btn glass px-3"
+                    data-wishlist-toggle
+                    data-url="{% if item.place %}{% url 'wishlist:toggle' 'place' item.place.id %}{% else %}{% url 'wishlist:toggle' 'trainer' item.trainer.id %}{% endif %}"
+                    data-active="true"
+                    data-label-active="♥"
+                    data-label-inactive="♡"
+                    aria-pressed="true"
+                  >
+                    ♥
+                  </button>
+                </div>
+                <p class="text-sm text-white/70">{% if item.place %}{{ item.place.city }}{% else %}{{ item.trainer.specialties }}{% endif %}</p>
+              </article>
+            {% endfor %}
+          </div>
+          {% include "components/paginator.html" with page_obj=wishlist_page %}
+          <div id="profile-wishlist-empty" class="text-center text-white/70 py-10 hidden">
+            <p>Wishlist is empty.</p>
+            <a href="{% url 'search:results' %}" class="text-[var(--green-300)] hover:text-[var(--green-200)]">Explore places</a>
+          </div>
+        {% else %}
+          <div class="text-center text-white/70 py-10" id="profile-wishlist-empty">
+            <p>Wishlist is empty.</p>
+            <a href="{% url 'search:results' %}" class="text-[var(--green-300)] hover:text-[var(--green-200)]">Explore places</a>
+          </div>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block extra_js %}
+<script>
+  const avatarInput = document.querySelector('#profile-form input[type="file"]');
+  const avatarPreview = document.getElementById('avatar-preview');
+  if (avatarInput && avatarPreview) {
+    avatarInput.addEventListener('change', (event) => {
+      const [file] = event.target.files;
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          avatarPreview.innerHTML = `<img src="${e.target.result}" alt="Avatar preview" class="w-full h-full object-cover"/>`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+  const wishlistGrid = document.getElementById('wishlist-grid');
+  const wishlistPaginator = wishlistGrid ? wishlistGrid.nextElementSibling : null;
+  const wishlistEmpty = document.getElementById('profile-wishlist-empty');
+  if (wishlistGrid) {
+    document.addEventListener('wishlist:toggled', (event) => {
+      const { button, added } = event.detail || {};
+      if (!button || added !== false) {
+        return;
+      }
+      if (!wishlistGrid.contains(button)) {
+        return;
+      }
+      const card = button.closest('article');
+      card?.remove();
+      if (!wishlistGrid.querySelector('article') && wishlistEmpty) {
+        wishlistGrid.classList.add('hidden');
+        wishlistPaginator?.classList.add('hidden');
+        wishlistEmpty.classList.remove('hidden');
+      }
+    });
+  }
+</script>
+{% endblock %}

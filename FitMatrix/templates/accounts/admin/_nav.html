@@ -1,0 +1,57 @@
+{% with match=request.resolver_match %}
+  {% with url_name=match.url_name|default:'' %}
+    <nav class="admin-nav" aria-label="Admin panel">
+      <a
+        href="{% url 'accounts:admin-console' %}"
+        class="admin-nav__link"
+        {% if url_name == 'admin-console' %}aria-current="page"{% endif %}
+      >
+        Overview
+      </a>
+
+      <a
+        href="{% url 'accounts:admin-users' %}"
+        class="admin-nav__link"
+        {% if url_name == 'admin-users' %}aria-current="page"{% endif %}
+      >
+        Admins
+      </a>
+      <a
+        href="{% url 'accounts:admin-places' %}"
+        class="admin-nav__link"
+        {% if url_name == 'admin-places' or url_name == 'admin-place-create' or url_name == 'admin-place-edit' %}aria-current="page"{% endif %}
+      >
+        Places
+      </a>
+
+      <a
+        href="{% url 'accounts:admin-trainers' %}"
+        class="admin-nav__link"
+        {% if url_name == 'admin-trainers' or url_name == 'admin-trainer-create' or url_name == 'admin-trainer-edit' %}aria-current="page"{% endif %}
+      >
+        Trainers
+      </a>
+      <a
+        href="{% url 'accounts:admin-slots' %}"
+        class="admin-nav__link"
+        {% if url_name == 'admin-slots' or url_name == 'admin-slot-create' or url_name == 'admin-slot-edit' %}aria-current="page"{% endif %}
+      >
+        Session slots
+      </a>
+      <a
+        href="{% url 'accounts:admin-bookings' %}"
+        class="admin-nav__link"
+        {% if url_name == 'admin-bookings' %}aria-current="page"{% endif %}
+      >
+        Bookings
+      </a>
+      <a
+        href="{% url 'accounts:admin-reviews' %}"
+        class="admin-nav__link"
+        {% if url_name == 'admin-reviews' %}aria-current="page"{% endif %}
+      >
+        Reviews
+      </a>
+    </nav>
+  {% endwith %}
+{% endwith %}

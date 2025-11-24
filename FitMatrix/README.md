@@ -12,7 +12,7 @@
 🏋️‍♂️ FitMatrix adalah aplikasi yang membantu khalayak untuk menemukan rekomendasi tempat olahraga 🏟️ di wilayah Jabodetabek, baik yang berbayar maupun gratis dan memungkinkan mereka untuk menyimpan tempat favorit sesuai preferensi mereka dari rekomendasi
 yang ada ke dalam wishlist serta memberi review setelah merasakan pengalaman berolahraga langsung di tempat. Selain itu, FitMatrix juga membantu user untuk menemukan rekomendasi personal trainer/ coach dan membooking sesi bersama mereka.
 
-## 👥 Peran atau aktor pengguna aplikasi
+👥 Jenis Pengguna
 1. User(biasa) – ditargetkan pada sebagian besar Sport Enthusiast.
 User ini ditargetkan pada sebagian besar Sport Enthusiast yang butuh referensi tempat yang bervariasi, baik yang berbayar maupun gratis. Mereka bisa memanfaatkan fitur-fitur di aplikasi kami:
 - 🎯 Filter berdasarkan cabang olahraga
@@ -27,9 +27,9 @@ User ini ditargetkan pada sebagian besar Sport Enthusiast yang butuh referensi t
 - ✏️ Mengedit dan menghapus data spot olahraga & trainer
 - ❌ Cancel appointment PT/Coach
 
-## Daftar modul yang diimplementasikan beserta pembagian kerja per anggota 🗂️
+## Daftar Modul 🗂️
 # 👥 Auth & Profile (Modul Autentikasi dan Profil Pengguna)
--> Modul ini mengelola registrasi, login, dan profil pengguna. Pengguna yang sudah login dapat mengelola data pribadi mereka, serta mengakses fitur-fitur lain seperti add tempat ke wishlist dan memberikan review suatu tempat. Dikerjakan oleh Gregorius Ega
+-> Modul ini mengelola registrasi, login, dan profil pengguna. Pengguna yang sudah login dapat mengelola data pribadi mereka, serta mengakses fitur-fitur lain seperti add tempat ke wishlist dan memberikan review suatu tempat.
 
 Fitur Utama:
 - Registrasi, login, dan pengelolaan akun.
@@ -40,7 +40,7 @@ Integrasi -> Terkoneksi dengan modul Wishlist, Review, dan Appointment.
 
 
 # 🔍 Search (Modul Pencarian)
--> Memudahkan pengguna mencari tempat olahraga berdasarkan kata kunci dan filter. Dikerjakan oleh Marvel Irawan
+-> Memudahkan pengguna mencari tempat olahraga berdasarkan kata kunci dan filter.
 
 Fitur Utama:
 - Pencarian berdasarkan kata kunci.
@@ -52,7 +52,7 @@ Integrasi: Terkoneksi dengan modul Place dan Hot Deals.
 
 
 # 🏟️ Place (Modul Tempat Olahraga)
--> Mengelola data tempat olahraga dan menampilkan rincian informasi tempat seperti fasilitas, deskripsi, lokasi, dan mengintegrasikannya dengan google maps. Dikerjakan oleh Fadhil Daffa
+-> Mengelola data tempat olahraga dan menampilkan rincian informasi tempat seperti fasilitas, deskripsi, lokasi, dan mengintegrasikannya dengan google maps.
 
 Fitur Utama:
 - Menyimpan data tempat olahraga (lokasi, fasilitas, deskripsi, harga jika berbayar).
@@ -65,7 +65,7 @@ Integrasi: Terkoneksi dengan Search, Wishlist, dan Review, Place, Search, dan Ho
 
 
 # ⭐ Wishlist (Modul Daftar Favorit)
--> Mengizinkan pengguna untuk menyimpan tempat olahraga favorit mereka agar dapat dengan mudah diakses di kemudian hari. Dikerjakan oleh Kanayra Maritza
+-> Mengizinkan pengguna untuk menyimpan tempat olahraga favorit mereka agar dapat dengan mudah diakses di kemudian hari.
 
 Fitur Utama:
 - Menyimpan tempat pada card wishlist yang dimana card tersebut bisa diberikan keterangan sesuai preferensi mereka.
@@ -76,7 +76,7 @@ Integrasi: Terkoneksi dengan Place dan Auth & Profile.
 
 # 👍 Review (Modul Ulasan dan Rating)
 -> Pengguna dapat memberikan rating dan review pada tempat olahraga yang mereka kunjungi untuk membantu pengguna lain dalam memilih tempat terbaik namun dengan
-syarat pengguna tersebut harus sudah login.  Dikerjakan oleh Dhea Anggrayningsih
+syarat pengguna tersebut harus sudah login. 
 
 Fitur Utama:
 - Memberikan rating (1-5) dan komentar untuk tempat olahraga.
@@ -89,7 +89,7 @@ Integrasi: Terkoneksi dengan Place dan Auth & Profile.
 
 # 🏋️‍♂️Trainer Booking (Modul Pemesanan Trainer)
 -> Memungkinkan pengguna untuk melihat daftar trainer yang available di suatu tempat beserta specialities mereka dan melakukan booking sesi olahraga dengan mereka.
-Pengguna juga bisa melihat trainer yang available di jam tertentu.  Dikerjakan oleh Kalfin Jefwin
+Pengguna juga bisa melihat trainer yang available di jam tertentu. 
 
 Fitur utama: 
 - Melihat daftar trainer beserta spesialisasi, rating, dan jadwal tersedia.
@@ -103,15 +103,13 @@ Fitur utama:
 
 Integrasi Terkoneksi dengan Auth & Profile, Review, Place, dan Search
 
-#  🧩 Integrasi dengan Situs Web 
-- Mengimplementasikan sebuah wrapper class dengan menggunakan library http dan map untuk mendukung penggunaan cookie-based authentication pada aplikasi.
-- Mengimplementasikan REST API pada Django (views.py) dengan menggunakan JsonResponse atau Django JSON Serializer.
-- Mengimplementasikan desain front-end untuk aplikasi berdasarkan desain website yang sudah ada sebelumnya.
-- Melakukan integrasi antara front-end dengan back-end dengan menggunakan konsep asynchronous HTTP.
 
 # 🎨 Link Figma: 
-https://www.figma.com/design/nkK1yFNK66zuQtAnYOGL51/PBP-C11-Mobile-Design?node-id=0-1&t=M48Aoct9gydR8JfQ-1
+https://www.figma.com/design/vXSH1mwzy0O4ozmXNNKxCT/FitMatrix?node-id=0-1&t=0LneyTAaBzi1ylCE-1
+password: olahega
 
+# 🌐 Link deployment PWS:
+https://fadhil-daffa-fitmatrix.pbp.cs.ui.ac.id/
 
 # 🗃️ Initial dataset: 
 https://huggingface.co/datasets/Shiowo2/Initial-Data-FitMatrix
