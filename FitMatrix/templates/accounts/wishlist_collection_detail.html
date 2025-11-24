@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}{{ collection.name }} Details | FitMatrix{% endblock %}
+
+{% block content %}
+<section class="max-w-5xl mx-auto px-4 py-10">
+  <form id="csrf-form">{% csrf_token %}</form> <!-- ✅ tambahkan token -->
+
+  <a href="{% url 'accounts:wishlist_page' %}"
+     class="text-sm text-[#0E3A22] hover:text-[#145734] underline mb-6 inline-block">
+    ← Back to Wishlist Collections
+  </a>
+
+  <!-- Header -->
+  <div class="mt-6 mb-8">
+    <h1 class="text-3xl font-bold text-[#0E3A22] mb-2">{{ collection.name }}</h1>
+    {% if collection.description %}
+      <p class="text-[#497D5E] text-sm leading-relaxed">{{ collection.description }}</p>
+    {% endif %}
+    <p class="text-xs text-gray-500 mt-1">
+      Created on {{ collection.created_at|date:"F j, Y" }}
+    </p>
+  </div>
+
+  <!-- Items grid -->
+  {% if items %}
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+    {% for item in items %}
+    <div class="rounded-3xl bg-white/80 border border-[#C9FFD4] shadow-sm p-6 flex flex-col justify-between transition-all duration-300 hover:shadow-md hover:scale-[1.02]">
+      <div>
+        {% if item.place.image %}
+          <img src="{{ item.place.image.url }}" alt="{{ item.place.name }}" class="rounded-2xl mb-4 w-full h-40 object-cover">
+        {% endif %}
+        <h3 class="text-lg font-semibold text-[#12391E] mb-1 truncate">{{ item.place.name }}</h3>
+        <p class="text-sm text-[#497D5E]">{{ item.place.city }}</p>
+      </div>
+
+      <div class="flex justify-between items-center mt-6 pt-4 border-t border-[#E0F2E9]">
+        <a href="{% url 'places:detail' item.place.slug %}"
+           class="text-sm font-medium text-[#0E3A22] underline hover:text-[#145734]">
+          View Details
+        </a>
+        <button type="button"
+                class="text-sm text-red-500 hover:underline remove-btn"
+                data-url="{% url 'accounts:delete_collection_item' item.id %}">
+          Remove
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <p class="text-gray-500 mt-10 text-center">This collection doesn’t contain any saved places yet.</p>
+  {% endif %}
+</section>
+
+<!-- Toast notification -->
+<div id="toast"
+     class="hidden fixed top-6 right-6 px-4 py-3 rounded-xl text-sm font-medium shadow-md border z-[9999] pointer-events-none">
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const toast = document.getElementById("toast");
+  const csrftoken = document.querySelector("[name=csrfmiddlewaretoken]").value; // ✅ token pasti ada
+
+  function showToast(message, type = "success") {
+    toast.textContent = message;
+    toast.className = `fixed top-6 right-6 px-4 py-3 rounded-xl text-sm font-medium shadow-md border z-[9999] pointer-events-none transition-opacity duration-500 ${
+      type === "error"
+        ? "bg-red-100 text-red-800 border-red-300"
+        : "bg-green-100 text-green-800 border-green-300"
+    }`;
+    toast.classList.remove("hidden");
+    toast.style.opacity = "1";
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      setTimeout(() => toast.classList.add("hidden"), 500);
+    }, 2500);
+  }
+
+  document.querySelectorAll(".remove-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const card = btn.closest(".rounded-3xl");
+      const url = btn.dataset.url;
+
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": csrftoken,
+            "Accept": "application/json",
+          },
+        });
+
+        if (!res.ok) throw new Error(`Failed: ${res.status}`);
+
+        // Smooth removal animation
+        card.style.transition = "all 0.4s ease";
+        card.style.opacity = "0";
+        card.style.transform = "translateY(10px)";
+        setTimeout(() => card.remove(), 400);
+
+        showToast("✅ Place removed from collection.");
+      } catch (err) {
+        console.error("Remove error:", err);
+        showToast("⚠️ Failed to remove place.", "error");
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

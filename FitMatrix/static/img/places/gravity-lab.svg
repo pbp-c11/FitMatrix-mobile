@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
+  <defs>
+    <linearGradient id="gradGravity" x1="0%" x2="100%" y1="100%" y2="0%">
+      <stop offset="0%" stop-color="#101b3a" />
+      <stop offset="100%" stop-color="#274f8f" />
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#gradGravity)" rx="36" />
+  <g fill="none" stroke="#4dd0ff" stroke-width="14" opacity="0.85">
+    <rect x="140" y="160" width="360" height="140" rx="30" />
+    <path d="M140 220 H500" />
+    <path d="M220 160 V300" />
+    <path d="M420 160 V300" />
+  </g>
+  <text x="70" y="94" font-family="'Montserrat', sans-serif" font-size="52" font-weight="700" fill="#bfe4ff">Gravity Lab Courts</text>
+  <text x="74" y="138" font-family="'Montserrat', sans-serif" font-size="26" fill="#d7ecff" opacity="0.9">Multi-sport &amp; skills arena</text>
+</svg>

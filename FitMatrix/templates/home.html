@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}FitMatrix | Adaptive fitness ecosystems{% endblock %}
+
+{% block content %}
+<!-- ================= HERO ================= -->
+<section class="max-w-[1200px] mx-auto px-6 pb-24">
+  <div class="grid lg:grid-cols-2 gap-8 items-stretch mt-4">
+    <!-- LEFT CARD -->
+    <article class="matrix-card matrix-glow" data-variant="hero">
+      <div class="matrix-label">
+        Move. Train. Evolve.
+      </div>
+
+      <h1 class="text-[#09412D] leading-[1.05] font-semibold text-[52px] sm:text-[58px] lg:text-[64px]">
+        <br/> Let's Get<br/>Moving With<br/>FitMatrix
+      </h1>
+
+      <p class="mt-6 text-[#144531]/80 text-[17px] leading-relaxed max-w-[560px]">
+        Looking for a great place to play or someone to guide you?
+        Explore top-rated sport venues, connect with certified trainers,
+        and start achieving your goals&mdash;one move at a time.
+      </p>
+
+      <div class="mt-10 grid grid-cols-2 gap-12">
+        <div>
+          <p class="text-[#09412D] font-semibold text-[64px] leading-none">{{ summary.place_count|default:0 }}</p>
+          <p class="text-[#09412D]/70 mt-2">More than 100 places<br/>for you</p>
+        </div>
+        <div>
+          <p class="text-[#09412D] font-semibold text-[64px] leading-none">{{ summary.trainer_count|default:0 }}</p>
+          <p class="text-[#09412D]/70 mt-2">10+ certified trainers</p>
+        </div>
+      </div>
+
+      <a href="{% url 'accounts:register' %}"
+         class="mt-8 inline-flex items-center justify-center h-11 px-6 rounded-full border-2 border-[#BAECCF] bg-[#EAF4EA]/60 text-[#032304] text-base">
+        Sign Up Now
+      </a>
+    </article>
+
+    <!-- RIGHT VISUAL -->
+    <div class="relative rounded-[60px] overflow-hidden border border-black/10 shadow-md min-h-[720px] lg:min-h-[1000px]">
+      <img src="{% static 'img/run-dashboard.png' %}" alt="People running past modern facade"
+           class="absolute inset-0 w-full h-full object-cover" />
+
+      <div class="absolute inset-0"
+           style="background: linear-gradient(152deg, rgba(246,255,237,0.30) 0%, rgba(217,254,220,0.30) 100%);"></div>
+
+      <div class="absolute right-6 top-20 text-[#F0FDF4] text-[40px] leading-[1.15] tracking-[0.12em] hidden xl:block text-center select-none font-['Palanquin Dark']" aria-hidden="true">
+        F<br/>I<br/>T<br/>M<br/>A<br/>T<br/>R<br/>I<br/>X
+      </div>
+
+      <div class="absolute bottom-0 left-0 right-0 px-10 pb-14">
+        <h2 class="text-white font-semibold text-[32px] sm:text-[40px] lg:text-[44px] leading-tight mb-4">
+          Every Step Builds Strength.
+        </h2>
+        <p class="text-white/90 text-[16px] sm:text-[17px] leading-relaxed max-w-[500px] text-justify">
+          Every movement counts&mdash;not just for your body, but for your growth. At FitMatrix, we believe fitness is more
+          than a routine; it is a journey of consistency, discipline, and self-discovery. Whether you are finding the perfect
+          place to train or the right mentor to guide you, every step brings you closer to your strongest self.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section class="max-w-[1200px] mx-auto px-6 mt-24 pb-24">
+  <h2 class="text-[#09412D] text-[36px] sm:text-[42px] font-extrabold text-center mb-14">
+    About
+  </h2>
+
+  <div class="bg-[#FDFEFD] border-2 border-[#A6D8FF] rounded-[40px] shadow-md p-12 relative overflow-hidden">
+    <div class="border border-[#DDEEE1] rounded-[36px] bg-[#FFFFFF]/90 p-10 shadow-sm">
+      <h2 class="text-[#09412D] text-[48px] font-extrabold mb-6">FitMatrix</h2>
+
+      <div class="grid lg:grid-cols-2 gap-10 text-[#144531]/90 text-[17px] leading-relaxed text-justify">
+        <p>
+          FitMatrix adalah platform pintar yang membantu kamu menemukan tempat olahraga terbaik dan trainer profesional
+          sesuai kebutuhan, lokasi, dan gaya hidupmu. Dari gym, studio, hingga pelatih bersertifikat, semua bisa kamu
+          temukan dengan mudah lewat sistem rekomendasi yang cepat, akurat, dan terpercaya.
+        </p>
+        <p>
+          Dengan FitMatrix, kamu tidak perlu lagi bingung memilih di mana harus mulai. Cukup jelajahi, bandingkan, dan
+          temukan tempat atau trainer yang paling cocok dengan tujuanmu. FitMatrix hadir sebagai partner perjalanan menuju
+          hidup yang lebih sehat, kuat, dan seimbang. <strong>Bersama FitMatrix, raih versi terbaik dirimu
+          dimulai hari ini.</strong>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TESTIMONIAL ================= -->
+<section class="max-w-[1200px] mx-auto px-6 mt-24 pb-24">
+  <h2 class="text-[#09412D] text-[36px] sm:text-[42px] font-extrabold text-center mb-14">
+    What People Say About FitMatrix?
+  </h2>
+
+  <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="bg-[#E8FFE6] rounded-[30px] shadow-md border border-[#0AAE5A]/20 p-8 text-center">
+      <h3 class="text-[#09412D] font-semibold text-[18px]"> <u>Raga Budiman</u></h3>
+      <p class="text-[#144531]/80 text-[15px] mb-4">Pegawai</p>
+      <p class="text-[#144531]/90 text-[16px] leading-relaxed">
+        &ldquo;Dulu aku sering bingung cari tempat olahraga yang cocok setelah kerja.
+        Sejak pakai FitMatrix, gampang banget nemu gym yang dekat kantor dan ada
+        trainernya juga. Sekarang olahraga jadi rutinitas yang aku tunggu-tunggu!&rdquo;
+      </p>
+    </div>
+
+    <div class="bg-[#E8FFE6] rounded-[30px] shadow-md border border-[#0AAE5A]/20 p-8 text-center">
+      <h3 class="text-[#09412D] font-semibold text-[18px]"><u>Rizky</u></h3>
+      <p class="text-[#144531]/80 text-[15px] mb-4">Pelari Marathon</p>
+      <p class="text-[#144531]/90 text-[16px] leading-relaxed">
+        &ldquo;Aku lagi nyari pelatih buat bantu ningkatin stamina sebelum race.
+        FitMatrix kasih banyak pilihan trainer dengan profil dan review lengkap.
+        Gampang bandingin dan booking langsung. Latihanku jadi jauh lebih terarah.&rdquo;
+      </p>
+    </div>
+
+    <div class="bg-[#E8FFE6] rounded-[30px] shadow-md border border-[#0AAE5A]/20 p-8 text-center">
+      <h3 class="text-[#09412D] font-semibold text-[18px]"><u>Alina</u></h3>
+      <p class="text-[#144531]/80 text-[15px] mb-4">Perenang</p>
+      <p class="text-[#144531]/90 text-[16px] leading-relaxed">
+        &ldquo;Buat aku yang sering pindah lokasi kelas, FitMatrix ngebantu banget buat nemuin
+        tempat latihan baru yang sesuai vibe-ku. Bisa lihat rating dan fasilitas tiap tempat,
+        jadi tidak pernah salah pilih lagi.&rdquo;
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TRENDING ================= -->
+<section class="relative max-w-[1200px] mx-auto px-6 mt-24 pb-24 space-y-8 overflow-visible">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <h2 class="matrix-section-title">Trending Coordinates</h2>
+      <span class="matrix-meta-label">High-scoring synergy picks</span>
+    </div>
+    <div class="matrix-grid">
+      {% for place in spotlights %}
+        <article class="matrix-card">
+          {% with image=place.hero_image|default:'media/aqua-circuit.jpg' %}
+            <div class="matrix-card__media">
+              {% if image and '://' in image %}
+                <img src="{{ image }}" alt="{{ place.name }}" loading="lazy" />
+              {% else %}
+                <img src="{% static image %}" alt="{{ place.name }}" loading="lazy" />
+              {% endif %}
+              <span class="matrix-card__badge">Matrix pick</span>
+            </div>
+          {% endwith %}
+          <div class="matrix-card__body">
+            <div class="matrix-card__meta">
+              <span>{{ place.city }}</span>
+              <span>{{ place.price_display }}</span>
+              <span>{{ place.facility_type }}</span>
+            </div>
+            <h3 class="matrix-card__title">{{ place.name }}</h3>
+            <p class="text-forest-muted text-sm">{{ place.tagline|default:place.summary|truncatewords:20 }}</p>
+            <div class="matrix-card__amenities">
+              {% for amenity in place.amenities_list|slice:":4" %}
+                <span>{{ amenity }}</span>
+              {% empty %}
+                <span>Coach-led</span>
+                <span>Community vibe</span>
+              {% endfor %}
+            </div>
+            <div class="flex flex-wrap items-center gap-3 justify-between">
+              <span class="matrix-price-tag">
+                {{ place.price_display }}
+                <span>per session</span>
+              </span>
+              <a href="{{ place.get_absolute_url }}" class="matrix-btn" data-variant="ghost">View detail</a>
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <div class="matrix-empty-state">
+          <h3>Spotlight pending</h3>
+          <p>Set highlight scores in the admin to surface your flagship venues here.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+<!-- ================= NEWEST ================= -->
+<section class="relative max-w-[1200px] mx-auto px-6 mt-24 pb-24 space-y-8 overflow-visible">
+  <div class="relative flex items-center gap-4">
+    <span class="h-[8px] w-10 rounded-full bg-[#B5EB54] translate-y-[0.2rem]"></span>
+    <h2 class="text-[#09412D] font-['Palanquin Dark'] text-[40px] sm:text-[44px] font-extrabold">
+      New In the FitMatrix
+    </h2>
+  </div>
+
+  <div class="relative grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+    {% include "_cards.html" with places=newest_places %}
+  </div>
+</section>
+
+{% endblock %}

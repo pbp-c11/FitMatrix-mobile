@@ -1,0 +1,111 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../core/theme.dart';
+import '../../data/auth_controller.dart';
+import '../../widgets/matrix_button.dart';
+import '../../widgets/matrix_card.dart';
+import '../../widgets/matrix_scaffold.dart';
+
+class ProfileScreen extends ConsumerWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final auth = ref.watch(authControllerProvider);
+    final user = auth.state.user;
+
+    if (!auth.state.isAuthenticated || user == null) {
+      return MatrixScaffold(
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Sign in to view your profile'),
+              const SizedBox(height: 12),
+              MatrixButton(
+                label: 'Login',
+                onPressed: () => context.go('/login'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return MatrixScaffold(
+      body: ListView(
+        padding: const EdgeInsets.only(top: 14, bottom: 20),
+        children: [
+          MatrixCard(
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 32,
+                  backgroundColor: MatrixColors.mint,
+                  child: Text(user.displayName.isNotEmpty ? user.displayName[0].toUpperCase() : user.username[0].toUpperCase(),
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: MatrixColors.ink)),
+                ),
+                const SizedBox(width: 14),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(user.displayName, style: Theme.of(context).textTheme.titleLarge),
+                    Text(user.email, style: Theme.of(context).textTheme.bodySmall),
+                    Chip(
+                      label: Text(user.isAdmin ? 'ADMIN' : 'USER'),
+                      backgroundColor: user.isAdmin ? MatrixColors.highlight : MatrixColors.mint,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          MatrixCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Shortcuts', style: Theme.of(context).textTheme.titleMedium),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: [
+                    MatrixButton(
+                      label: 'My bookings',
+                      variant: MatrixButtonVariant.ghost,
+                      onPressed: () => context.go('/bookings'),
+                    ),
+                    MatrixButton(
+                      label: 'Wishlist',
+                      variant: MatrixButtonVariant.ghost,
+                      onPressed: () => context.go('/wishlist'),
+                    ),
+                    if (user.isAdmin)
+                      MatrixButton(
+                        label: 'Admin',
+                        variant: MatrixButtonVariant.ghost,
+                        onPressed: () => context.go('/admin'),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 14),
+          MatrixButton(
+            label: 'Log out',
+            variant: MatrixButtonVariant.danger,
+            expand: true,
+            onPressed: () async {
+              await ref.read(authControllerProvider).logout();
+              if (context.mounted) context.go('/login');
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
