@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
+  <defs>
+    <radialGradient id="gradZen" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#ffe9ab" />
+      <stop offset="100%" stop-color="#ff8f70" />
+    </radialGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#gradZen)" rx="36" />
+  <g fill="none" stroke="#ffffff" stroke-width="10" opacity="0.85">
+    <circle cx="320" cy="180" r="110" />
+    <circle cx="320" cy="180" r="160" stroke-dasharray="18 22" />
+    <path d="M220 260 Q320 320 420 260" stroke-linecap="round" />
+  </g>
+  <text x="80" y="92" font-family="'Montserrat', sans-serif" font-size="52" font-weight="700" fill="#ffffff">Luminous Recovery</text>
+  <text x="84" y="138" font-family="'Montserrat', sans-serif" font-size="26" fill="#fff8f2" opacity="0.9">Breath, light &amp; contrast therapy</text>
+</svg>

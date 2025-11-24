@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}{{ trainer.name }} · FitMatrix{% endblock %}
+{% block content %}
+<section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-20 space-y-12">
+  <header class="matrix-glass matrix-glow px-6 sm:px-8 py-10 rounded-[32px] space-y-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <div class="space-y-4 max-w-3xl">
+        <span class="matrix-label">Certified coach</span>
+        <h1 class="text-3xl sm:text-[2.6rem] font-semibold leading-tight">{{ trainer.name }}</h1>
+        <p class="text-forest-muted">{{ trainer.bio|default:trainer.specialties }}</p>
+        <div class="flex flex-wrap items-center gap-3 text-sm text-forest-muted">
+          <span class="matrix-pill">Specialties: {{ trainer.specialties }}</span>
+          <span class="matrix-pill">Rating {{ trainer.rating_avg|floatformat:1 }}</span>
+          <span class="matrix-pill">{{ trainer.likes }} likes</span>
+          <span class="matrix-pill">Rp {{ trainer.price_per_session|floatformat:0 }} / session</span>
+        </div>
+      </div>
+      <div class="flex flex-col items-start gap-3">
+        {% if request.user.is_authenticated %}
+          <button
+            type="button"
+            class="matrix-btn"
+            data-variant="ghost"
+            data-wishlist-toggle
+            data-url="{% url 'wishlist:toggle' 'trainer' trainer.pk %}"
+            data-active="{% if is_favorite %}true{% else %}false{% endif %}"
+            data-label-active="Saved"
+            data-label-inactive="Save trainer"
+            aria-pressed="{% if is_favorite %}true{% else %}false{% endif %}"
+          >
+            {% if is_favorite %}Saved{% else %}Save trainer{% endif %}
+          </button>
+        {% else %}
+          <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="matrix-btn" data-variant="ghost">Login to save</a>
+        {% endif %}
+        {% if trainer.calendly_url %}
+          <a href="{{ trainer.calendly_url }}" target="_blank" rel="noopener" class="matrix-btn">Book via Calendly</a>
+        {% endif %}
+        <a href="{% url 'scheduling:booking-manage' %}" class="matrix-link">View my bookings</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <h2 class="matrix-section-title">Upcoming availability</h2>
+      <span class="matrix-meta-label">Secure your slot</span>
+    </div>
+    <div class="glass card overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="text-white/70">
+          <tr>
+            <th class="text-left py-2 pr-4">Date</th>
+            <th class="text-left py-2 pr-4">Location</th>
+            <th class="text-left py-2 pr-4">Capacity</th>
+            <th class="text-left py-2 pr-4">Action</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-white/10">
+          {% for slot in upcoming_slots %}
+            <tr class="hover:bg-white/5">
+              <td class="py-3 pr-4">{{ slot.start|date:"M d, Y" }} · {{ slot.start|date:"H:i" }}</td>
+              <td class="py-3 pr-4">{{ slot.place.name }}</td>
+              <td class="py-3 pr-4">{{ slot.seats_left }} seats left</td>
+              <td class="py-3 pr-4">
+                {% if request.user.is_authenticated %}
+                  <form method="post" action="{% url 'scheduling:booking-create' slot.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="slot" value="{{ slot.pk }}" />
+                    <button type="submit" class="matrix-btn" data-variant="ghost">Book session</button>
+                  </form>
+                {% else %}
+                  <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="matrix-btn" data-variant="ghost">Login to book</a>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="4" class="py-6 text-center text-white/70">No active slots at the moment. Check back soon or use the Calendly link above.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="space-y-6">
+    <div class="flex items-center justify-between gap-4">
+      <h2 class="matrix-section-title">Recent feedback</h2>
+      <a href="{% url 'reviews:list' %}" class="matrix-link">View all</a>
+    </div>
+    {% if reviews %}
+      <div class="space-y-4">
+        {% for review in reviews|slice:":5" %}
+          <article class="glass card bg-white/5 space-y-2">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-semibold">{{ review.user.display_name|default:review.user.username }}</p>
+                <p class="text-xs text-white/60">{{ review.created_at|date:"M d, Y" }}</p>
+              </div>
+              <span class="matrix-pill">{{ review.rating }}/5</span>
+            </div>
+            <p class="text-sm text-white/70">{{ review.comment }}</p>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="text-white/70">No reviews yet. Book a session to share your feedback.</p>
+    {% endif %}
+  </section>
+</section>
+{% endblock %}

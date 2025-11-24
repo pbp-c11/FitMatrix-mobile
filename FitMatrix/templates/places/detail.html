@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ place.name }} | FitMatrix{% endblock %}
+
+{% block content %}
+<article class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 pb-24 space-y-16">
+
+  <!-- HERO & GALLERY -->
+  <section class="grid md:grid-cols-4 gap-4 mt-6">
+    <div class="md:col-span-3 relative rounded-3xl overflow-hidden shadow-md">
+      {% with image=place.hero_image|default:'media/hero-athlete.jpg' %}
+        {% if image and '://' in image %}
+          <img src="{{ image }}" alt="{{ place.name }}" class="w-full h-[320px] object-cover" />
+        {% else %}
+          <img src="{% static image %}" alt="{{ place.name }}" class="w-full h-[320px] object-cover" />
+        {% endif %}
+      {% endwith %}
+      <span class="absolute top-3 left-3 bg-[#C9FFD4] text-[#083D2F] text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+        {{ place.facility_type|default:"GYM" }}
+      </span>
+    </div>
+
+    <div class="flex flex-col gap-3">
+      {% with gallery=place.gallery_list %}
+        {% if gallery %}
+          {% for image in gallery|slice:":3" %}
+            <img src="{% if image and '://' in image %}{{ image }}{% else %}{% static image %}{% endif %}"
+                 alt="Gallery image {{ forloop.counter }}"
+                 class="w-full h-[100px] object-cover rounded-2xl" />
+          {% endfor %}
+        {% else %}
+          <img src="{% static 'media/outdoor-matrix.jpg' %}" class="w-full h-[100px] object-cover rounded-2xl" />
+          <img src="{% static 'media/aqua-circuit.jpg' %}" class="w-full h-[100px] object-cover rounded-2xl" />
+          <img src="{% static 'media/studio-flow.jpg' %}" class="w-full h-[100px] object-cover rounded-2xl" />
+        {% endif %}
+      {% endwith %}
+    </div>
+  </section>
+
+  <!-- INFO & LOCATION -->
+  <section class="grid md:grid-cols-3 gap-10 mt-4">
+    <div class="md:col-span-2 space-y-6">
+      <h1 class="text-3xl sm:text-[2.2rem] font-semibold text-[#12391E]">{{ place.name }}</h1>
+      <p class="text-[#3E6147] text-sm sm:text-base leading-relaxed">{{ place.summary|default:place.tagline }}</p>
+
+      <div class="flex flex-wrap gap-2 mt-2">
+        {% for amenity in place.amenities_list|slice:":6" %}
+          <span class="inline-flex items-center gap-1 rounded-full border border-[#8EEA6E] bg-[#8EEA6E]/30 text-[#0B2A12] px-3 py-1 text-xs font-semibold shadow-sm">{{ amenity }}</span>
+        {% empty %}
+          <span class="inline-flex items-center gap-1 rounded-full border border-[#8EEA6E] bg-[#8EEA6E]/30 text-[#0B2A12] px-3 py-1 text-xs font-semibold shadow-sm">Good Facilities</span>
+        {% endfor %}
+      </div>
+
+      <div class="mt-6 rounded-2xl border border-[#8EEA6E]/70 bg-white p-5 shadow-sm">
+        <h3 class="text-[#0E3A22] font-semibold mb-3">Location</h3>
+        {% if place.google_maps_url %}
+          <a href="{{ place.google_maps_url }}" target="_blank" rel="noopener noreferrer"
+             class="group block rounded-xl border border-transparent bg-[#E8FCE9] px-4 py-3 hover:border-[#8EEA6E] transition">
+            <p class="text-sm text-[#1B4A26] font-medium group-hover:text-[#0E3A22]">{{ place.address }}</p>
+            <p class="text-sm text-[#315739]/80">{{ place.city }}</p>
+            <span class="mt-2 inline-flex items-center gap-2 text-xs font-semibold text-[#0E3A22] group-hover:underline">
+              Open in Google Maps
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                <path fill-rule="evenodd"
+                      d="M5.22 14.78a.75.75 0 010-1.06L11.94 7H7.75a.75.75 0 010-1.5h5.5a.75.75 0 01.75.75v5.5a.75.75 0 01-1.5 0V8.06l-6.72 6.72a.75.75 0 01-1.06 0z"
+                      clip-rule="evenodd" />
+              </svg>
+            </span>
+          </a>
+        {% else %}
+          <p class="text-sm text-[#315739]">{{ place.address }}</p>
+          <p class="text-sm text-[#315739]/80">{{ place.city }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ADD TO COLLECTION -->
+    <div class="bg-white/60 backdrop-blur-md border border-white/40 shadow-md rounded-3xl p-6 space-y-5">
+      <h3 class="text-lg font-semibold text-[#0E3A22]">Add to Collection</h3>
+      {% if request.user.is_authenticated %}
+        <form id="collectionForm"
+              data-add-url="{% url 'accounts:add-to-collection' %}"
+              data-create-url="{% url 'accounts:create-collection' %}"
+              class="space-y-4">
+          {% csrf_token %}
+          <input type="hidden" name="place_id" value="{{ place.id }}">
+          <div>
+            <label class="text-xs font-semibold text-[#356B3A] mb-1 block">Save To</label>
+            <select id="collectionSelect" name="collection_id"
+                    class="matrix-input w-full rounded-full border border-[#A5E1A2] text-sm px-3 py-2 bg-white/80 hover:bg-white transition">
+              <option value="">+ Create New Collection</option>
+            </select>
+          </div>
+
+          <div id="newCollectionFields" class="space-y-4">
+            <div>
+              <label class="text-xs font-semibold text-[#356B3A] mb-1 block">Collection Name</label>
+              <input type="text" id="collectionName" name="name"
+                    class="matrix-input w-full rounded-xl border border-[#A5E1A2] text-sm px-3 py-2"
+                    placeholder="Name your collection">
+            </div>
+            <div>
+              <label class="text-xs font-semibold text-[#356B3A] mb-1 block">Description</label>
+              <textarea id="collectionDesc" name="description"
+                        class="matrix-input w-full rounded-xl border border-[#A5E1A2] text-sm px-3 py-2"
+                        rows="2" placeholder="Add a short description"></textarea>
+            </div>
+          </div>
+
+          <button type="submit"
+                  class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#8EEA6E] to-[#5DD65B] text-[#0B2A12] font-semibold text-sm hover:brightness-105 transition-all">
+            <span>⭐</span> Add to Wishlist Collection
+          </button>
+        </form>
+      {% else %}
+        <a href="{% url 'accounts:login' %}?next={{ request.path }}"
+          class="block text-center w-full px-4 py-2 rounded-full bg-gradient-to-r from-[#8EEA6E] to-[#5DD65B] text-[#0B2A12] font-semibold text-sm hover:brightness-105 transition-all">
+          Login to Save
+        </a>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- 🧡 MEMBER REVIEWS -->
+  <section class="mt-10 md:col-span-2">
+    <h2 class="text-2xl font-semibold text-[#0E3A22] mb-6">Member Reviews</h2>
+
+    <div id="reviews-container">
+      {% for review in reviews %}
+        {% include "places/_single_review.html" %}
+      {% empty %}
+        <p class="text-gray-500 text-center">No reviews yet.</p>
+      {% endfor %}
+    </div>
+
+    {% if request.user.is_authenticated %}
+    <form id="reviewForm"
+          method="post"
+          action="{% url 'places:place_review_create' slug=place.slug %}"
+          class="mt-8 bg-white/70 border border-[#C9FFD4] rounded-2xl p-5 shadow-sm">
+      {% csrf_token %}
+      <h3 class="text-lg font-semibold text-[#12391E] mb-3">Leave a Review</h3>
+
+      <div class="space-y-4">
+        <div>
+          <label class="text-sm text-[#315739] font-medium mb-1 block">Your Review</label>
+          <textarea name="body" rows="3" required
+            class="w-full border border-[#A5E1A2] rounded-xl p-3 text-sm focus:ring-2 focus:ring-emerald-300"
+            placeholder="Write your feedback here..."></textarea>
+        </div>
+
+        <div>
+          <label class="text-sm text-[#315739] font-medium mb-1 block">Rating</label>
+          <select name="rating" required
+            class="w-full border border-[#A5E1A2] rounded-xl p-2 text-sm">
+            <option value="">Select rating</option>
+            <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+            <option value="4">⭐⭐⭐⭐ Good</option>
+            <option value="3">⭐⭐⭐ Average</option>
+            <option value="2">⭐⭐ Poor</option>
+            <option value="1">⭐ Terrible</option>
+          </select>
+        </div>
+
+        <button type="submit"
+          class="w-full py-2 rounded-full bg-gradient-to-r from-[#8EEA6E] to-[#5DD65B] text-[#0B2A12] font-semibold hover:brightness-105 transition-all">
+          Submit Review
+        </button>
+      </div>
+    </form>
+    {% else %}
+    <p class="text-sm text-[#497D5E] mt-6 text-center">
+      <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="text-emerald-700 underline font-medium">Login</a>
+      to leave a review.
+    </p>
+    {% endif %}
+  </section>
+</article>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector("#collectionForm");
+  const select = document.querySelector("#collectionSelect");
+  const csrftoken = document.querySelector("[name=csrfmiddlewaretoken]")?.value;
+
+  if (!form) return;
+
+  // 🔄 Load daftar koleksi user
+  async function refreshCollections() {
+    try {
+      const res = await fetch("/accounts/collections/list/");
+      const data = await res.json();
+
+      select.innerHTML = '<option value="">+ Create New Collection</option>';
+
+      if (data.collections && data.collections.length) {
+        data.collections.forEach((col) => {
+          const opt = document.createElement("option");
+          opt.value = col.id;
+          opt.textContent = col.name;
+          select.appendChild(opt);
+        });
+      }
+    } catch (err) {
+      console.warn("Failed to load collections:", err);
+    }
+  }
+
+  refreshCollections();
+
+  // 🔥 Submit handler
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const addUrl = form.dataset.addUrl;
+  const createUrl = form.dataset.createUrl;
+  const placeId = form.querySelector("[name=place_id]").value;
+  const name = form.querySelector("#collectionName").value;
+  const desc = form.querySelector("#collectionDesc").value;
+  const select = form.querySelector("#collectionSelect");
+
+  // 🔥 Tambahan penting
+  // Cek apakah user ngetik nama koleksi yang sudah ada di dropdown
+  const typedText = select.value?.trim().toLowerCase();
+  const matchedOption = Array.from(select.options).find(
+    (opt) => opt.textContent.trim().toLowerCase() === typedText
+  );
+
+  if (matchedOption && matchedOption.value) {
+    // Kalau ada koleksi dengan nama yang sama → langsung pilih koleksi itu
+    select.value = matchedOption.value;
+  }
+
+  const url = select.value ? addUrl : createUrl;
+  const payload = select.value
+    ? { collection_id: select.value, place_id: placeId }
+    : { name: select.value || name, description: desc, place_id: placeId };
+
+  const btn = form.querySelector("button[type='submit']");
+  btn.disabled = true;
+  btn.textContent = "Saving...";
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    if (data.success || data.status === "added") {
+      showToast("✅ Place added to your collection!");
+
+      // 🧠 Refresh dropdown biar koleksi baru langsung muncul
+      await refreshCollections();
+
+      // Kalau create baru, pilih otomatis koleksi yang barusan dibuat
+      if (data.collection?.id) {
+        select.value = data.collection.id;
+      }
+
+      form.reset();
+    } else {
+      showToast("⚠️ Failed to add place.");
+    }
+  } catch (err) {
+    console.error(err);
+    showToast("⚠️ Network error.");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "<span>⭐</span> Add to Wishlist Collection";
+  }
+});
+
+
+  function showToast(message) {
+    const toast = document.createElement("div");
+    toast.textContent = message;
+    toast.className =
+      "fixed bottom-6 right-6 bg-[#0E3A22] text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium animate-fade-in-up z-50";
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add("opacity-0", "translate-y-2");
+      setTimeout(() => toast.remove(), 300);
+    }, 2500);
+  }
+
+  const style = document.createElement("style");
+  style.textContent = `
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.3s ease-out forwards;
+  }
+  `;
+  document.head.appendChild(style);
+});
+</script>
+
+{% endblock %}

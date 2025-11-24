@@ -1,0 +1,216 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}FitMatrix{% endblock %}</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Koulen&family=Palanquin+Dark:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@400;500;600&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link rel="stylesheet" href="{% static 'css/matrix.css' %}" />
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body class="matrix-body">
+    <div class="matrix-global-bg" aria-hidden="true"></div>
+    <div class="matrix-shell flex flex-col min-h-screen">
+
+      <!-- HEADER -->
+      <header class="fixed top-0 inset-x-0 z-50 px-4 sm:px-6 lg:px-10 py-6">
+        <div class="max-w-6xl mx-auto relative overflow-hidden flex items-center justify-between gap-6 rounded-[50px] border border-black/10 shadow-md px-6 py-3"
+             style="background: linear-gradient(21deg,#FDFEFD 0%,#F0FDF4 100%);">
+
+          <!-- Brand -->
+          <a href="{% url 'home' %}" class="relative flex items-center gap-3 pl-5">
+            <img src="{% static 'img/logo-mark.png' %}" alt="FitMatrix Mark" class="w-16 h-16 object-contain" />
+            <span class="inline-flex items-center">
+              <span class="ml-1 text-[30px] tracking-[0.3em] font-[Koulen]">FITMATRIX</span>
+            </span>
+          </a>
+
+          {% url 'home' as home_url %}
+          {% url 'search:results' as search_url %}
+          {% url 'scheduling:sessions' as sessions_url %}
+          {% url 'scheduling:booking-manage' as booking_manage_url %}
+          {% url 'accounts:wishlist_page' as wishlist_url %}
+          {% with match=request.resolver_match url_name=match.url_name|default:'' %}
+
+        <!-- NAV -->
+        <nav class="matrix-nav hidden lg:flex items-center gap-10 text-[20px] tracking-[0.25em]" style="font-family: 'Koulen', system-ui, sans-serif;">
+          <a href="{{ home_url }}" {% if request.path == home_url %}aria-current="page"{% endif %}>Home</a>
+          <a href="{{ search_url }}" {% if match and match.app_name == 'search' %}aria-current="page"{% endif %}>Places</a>
+          <a href="{{ sessions_url }}" {% if match and match.app_name == 'scheduling' and url_name|slice:':7' != 'booking' %}aria-current="page"{% endif %}>Trainers</a>
+          <a href="{{ wishlist_url }}" {% if match and match.url_name == 'list' %}aria-current="page"{% endif %}>Wishlist</a>
+
+          {# ==== ADMIN PANEL (Desktop) ==== #}
+          {% if request.user.is_authenticated %}
+            {% if request.user.is_superuser or request.user.is_staff or request.user.is_admin %}
+              {% url 'accounts:admin-console' as admin_console_url %}
+              {% with url_name=request.resolver_match.url_name %}
+                {% with admin_pages=' admin-console admin-users admin-places admin-place-create admin-place-edit admin-trainers admin-trainer-create admin-trainer-edit admin-slots admin-slot-create admin-slot-edit admin-bookings admin-reviews ' %}
+                  <a href="{{ admin_console_url }}"
+                      {% if ' '|add:url_name|add:' ' in admin_pages %}aria-current="page"{% endif %}>
+                    Admin panel
+                  </a>
+                {% endwith %}
+              {% endwith %}
+            {% endif %}
+          {% endif %}
+        </nav>
+
+        <!-- Right actions -->
+        <div class="hidden lg:flex items-center gap-3 pr-5">
+          {% if request.user.is_authenticated %}
+            <a href="{% url 'accounts:profile' %}" class="px-6 py-2.5 rounded-full font-extrabold tracking-wide
+                  text-[#08381F]
+                  bg-gradient-to-r from-[#CFFF93] to-[#EFFF9E]
+                  border-2 border-[#0AAE5A]
+                  shadow-[0_4px_10px_rgba(212,255,111,0.35)]
+                  hover:shadow-[0_6px_16px_rgba(212,255,111,0.45)]
+                  hover:border-[#0AAE5A]
+                  hover:scale-[1.04] active:scale-[0.98]
+                  transition-all duration-300 ease-out" data-variant="ghost">Profile</a>
+            <a href="{{ booking_manage_url }}" class="px-6 py-2.5 rounded-full font-extrabold tracking-wide
+                  text-[#08381F]
+                  bg-gradient-to-r from-[#CFFF93] to-[#EFFF9E]
+                  border-2 border-[#0AAE5A]
+                  shadow-[0_4px_10px_rgba(212,255,111,0.35)]
+                  hover:shadow-[0_6px_16px_rgba(212,255,111,0.45)]
+                  hover:border-[#0AAE5A]
+                  hover:scale-[1.04] active:scale-[0.98]
+                  transition-all duration-300 ease-out" data-variant="ghost">Bookings</a>
+          {% else %}
+          <a href="{% url 'accounts:login' %}"
+          class="px-6 py-2.5 rounded-full font-extrabold tracking-wide
+                  text-[#08381F]
+                  bg-gradient-to-r from-[#CFFF93] to-[#EFFF9E]
+                  border-2 border-[#0AAE5A]
+                  shadow-[0_4px_10px_rgba(212,255,111,0.35)]
+                  hover:shadow-[0_6px_16px_rgba(212,255,111,0.45)]
+                  hover:border-[#0AAE5A]
+                  hover:scale-[1.04] active:scale-[0.98]
+                  transition-all duration-300 ease-out">
+          LOGIN
+        </a>
+          {% endif %}
+        </div>
+        {% endwith %}
+
+          <!-- MOBILE TOGGLE -->
+          <button type="button" class="lg:hidden matrix-btn relative" data-mobile-toggle data-variant="ghost" aria-label="Toggle navigation">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- MOBILE MENU -->
+        <div class="lg:hidden max-w-6xl mx-auto" data-mobile-menu style="max-height: 0; overflow: hidden; transition: max-height 240ms ease;">
+          <div class="mt-3 px-6 py-5 flex flex-col gap-4 rounded-[26px] bg-white/80 backdrop-blur border border-black/10" style="font-family: 'Koulen', system-ui, sans-serif;">
+            <a href="{% url 'home' %}" class="nav-underline">Home</a>
+            <a href="{% url 'search:results' %}" class="nav-underline">Places</a>
+            <a href="{% url 'scheduling:sessions' %}">Trainers</a>
+            <a href="{% url 'wishlist:list' %}">Wishlist</a>
+
+            {# ==== ADMIN PANEL (Mobile) ==== #}
+            {% if request.user.is_authenticated %}
+              {% if request.user.is_superuser or request.user.is_staff or request.user.is_admin %}
+                {% with url_name=request.resolver_match.url_name %}
+                  <a href="{% url 'accounts:admin-console' %}">Admin panel</a>
+                {% endwith %}
+              {% endif %}
+              <a href="{% url 'scheduling:booking-manage' %}">Bookings</a>
+              <a href="{% url 'accounts:profile' %}">Profile</a>
+            {% else %}
+              <a href="{% url 'accounts:login' %}">Login</a>
+            {% endif %}
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN -->
+      <main class="flex-1 w-full">
+        <div class="pt-[140px] lg:pt-[160px]">
+          {% block content %}{% endblock %}
+        </div>
+      </main>
+
+      <!-- FOOTER -->
+      <footer class="bg-[#052315] text-[#EAF8F0] mt-24 border-t border-[#145734]/40">
+        <div class="max-w-6xl mx-auto px-6 py-14">
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-y-10 gap-x-12 xl:gap-x-16 items-start">
+            <div class="sm:col-span-4">
+              <div class="flex items-center gap-3 mb-5">
+                <img src="{% static 'img/logo-mark.png' %}" alt="FitMatrix Logo" class="w-16 h-16 object-contain filter invert" />
+                <span class="text-[30px] tracking-[0.3em] font-[Koulen] whitespace-nowrap">FitMatrix</span>
+              </div>
+              <p class="text-white/85 leading-relaxed text-[15px]">Curated fitness ecosystems for Jakarta and beyond.</p>
+            </div>
+
+            <div class="sm:col-span-2">
+              <h4 class="text-[#B5EB54] text-xs tracking-[0.25em] mb-3 font-[Koulen]">COMPANY</h4>
+              <p class="text-white/85 text-[15px] leading-relaxed">
+                Jalan Pondok Cina No. 1<br/>Universitas Indonesia
+              </p>
+              <p class="mt-3 text-[15px] leading-relaxed !text-white">
+                <span class="!text-white">Contact us:</span><br/>
+                <a href="mailto:admin@fitmatrix.id" class="underline decoration-dotted !text-white hover:!text-white transition">
+                  admin@fitmatrix.id
+                </a>
+              </p>
+            </div>
+
+            <div class="sm:col-span-2">
+              <h4 class="text-[#B5EB54] text-xs tracking-[0.25em] mb-3 font-[Koulen]">PRODUCTS</h4>
+              <ul class="space-y-2 text-white/85 text-[15px]">
+                <li><a href="{% url 'search:results' %}" class="hover:text-white transition">Venues</a></li>
+                <li><a href="{% url 'scheduling:sessions' %}" class="hover:text-white transition">Trainers</a></li>
+              </ul>
+            </div>
+
+            <div class="sm:col-span-2">
+              <h4 class="text-[#B5EB54] text-xs tracking-[0.25em] mb-3 font-[Koulen]">REFERENCE</h4>
+              <ul class="space-y-2 text-white/85 text-[15px]">
+                <li>
+                  <a href="https://docs.google.com/document/d/1ueQeJeebFoYu8T8pDJQ8Qm3Dz6r5DNgNzy3byXfRNrc/edit?usp=sharing"
+                     target="_blank" rel="noopener noreferrer"
+                     class="underline decoration-dotted hover:text-white transition">
+                    References
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="sm:col-span-2">
+              <h4 class="text-[#B5EB54] text-xs tracking-[0.25em] mb-3 font-[Koulen]">SUPPORTED BY</h4>
+              <p class="text-white/85 text-[15px]">Fasilkom UI</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="border-t border-white/10">
+          <div class="max-w-6xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-white/65">
+            <p>&copy; {% now "Y" %} FitMatrix. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+
+    </div>
+    <div class="matrix-message-stack" role="status" aria-live="polite">
+      {% for message in messages %}
+        <div class="matrix-toast" data-toast data-tone="{% if 'error' in message.tags %}error{% elif 'info' in message.tags %}info{% else %}success{% endif %}">
+          <span class="matrix-label">{{ message.tags|default:"info" }}</span>
+          <span>{{ message }}</span>
+          <button type="button" aria-label="Dismiss" data-toast-dismiss>&times;</button>
+        </div>
+      {% endfor %}
+    </div>
+    <script src="{% static 'js/matrix.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+    <div id="portal-root" class="fixed inset-0 pointer-events-none z-[2147483647]"></div>
+  </body>
+</html>
