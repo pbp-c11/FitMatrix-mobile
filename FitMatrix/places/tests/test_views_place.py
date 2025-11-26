@@ -4,7 +4,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from places.models import Place, Review
+from places.models import Place
+from reviews.models import Review
 
 User = get_user_model()
 

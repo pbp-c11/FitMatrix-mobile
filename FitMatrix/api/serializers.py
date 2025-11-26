@@ -11,7 +11,8 @@ from accounts.models import (
     WishlistCollection,
     WishlistItem,
 )
-from places.models import Place, Review as PlaceReview
+from reviews.models import Review as PlaceReview
+from places.models import Place
 from reviews.models import Review as TrainerReview
 from scheduling.models import Booking, SessionSlot, Trainer
 

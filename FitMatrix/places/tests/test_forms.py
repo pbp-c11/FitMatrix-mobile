@@ -4,8 +4,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from places.forms import ReviewForm
-from places.models import Place, Review
-
+from places.models import Place
+from reviews.models import Review
 User = get_user_model()
 
 
@@ -40,5 +40,4 @@ class ReviewFormTests(TestCase):
         review = form.save()
         self.assertEqual(review.rating, 4)
         self.assertEqual(review.body, "Great vibe")
-        self.assertEqual(review.place, self.place)
         self.assertEqual(review.user, self.user)

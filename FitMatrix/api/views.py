@@ -18,9 +18,9 @@ from accounts.models import (
     WishlistCollection,
     WishlistItem,
 )
-from places.models import Place, Review as PlaceReview
+from places.models import Place
 from places.services import newest_places, search_places, spotlight_places
-from reviews.models import Review as TrainerReview
+from reviews.models import Review as TrainerReview, Review as PlaceReview
 from scheduling.models import Booking, SessionSlot, Trainer
 
 from .serializers import (
