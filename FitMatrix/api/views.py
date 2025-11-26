@@ -10,6 +10,7 @@ from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -306,14 +307,14 @@ class WishlistViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request):
-        items = WishlistItem.objects.filter(user=request.user).select_related("place", "trainer")
+        items = WishlistItem.objects.filter(user=request.user).select_related("place")
         serializer = WishlistItemSerializer(items, many=True)
         return Response(serializer.data)
 
     def create(self, request):
         kind = request.data.get("kind")
         target_id = request.data.get("target_id")
-        if kind not in {"place", "trainer"}:
+        if kind not in {"place"}:
             return Response({"detail": "Invalid kind"}, status=status.HTTP_400_BAD_REQUEST)
         if not target_id:
             return Response({"detail": "target_id is required"}, status=status.HTTP_400_BAD_REQUEST)
@@ -322,9 +323,7 @@ class WishlistViewSet(viewsets.ViewSet):
         if kind == "place":
             target = get_object_or_404(Place, pk=target_id)
             filters["place"] = target
-        else:
-            target = get_object_or_404(Trainer, pk=target_id)
-            filters["trainer"] = target
+       
 
         item = WishlistItem.objects.filter(**filters).first()
         status_label = "added"
@@ -334,43 +333,59 @@ class WishlistViewSet(viewsets.ViewSet):
         else:
             WishlistItem.objects.create(**filters)
 
-        items = WishlistItem.objects.filter(user=request.user).select_related("place", "trainer")
+        items = WishlistItem.objects.filter(user=request.user).select_related("place")
         serializer = WishlistItemSerializer(items, many=True)
         return Response({"status": status_label, "items": serializer.data})
 
 
 class WishlistCollectionViewSet(viewsets.ModelViewSet):
+    
     serializer_class = WishlistCollectionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return WishlistCollection.objects.filter(user=self.request.user).prefetch_related("items__place")
+        user = self.request.user
+        if user.is_staff or getattr(user, "is_admin", False):
+            return WishlistCollection.objects.all().prefetch_related("items__place")
+        return (
+            WishlistCollection.objects.filter(user=user).prefetch_related("items__place")
+        )
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    @action(detail=True, methods=["post"])
-    def add_item(self, request, pk=None):
+    @action(detail=True, methods=["post"], url_path="add")
+    def add(self, request, pk=None):
         collection = self.get_object()
-        place_id = request.data.get("place_id")
-        if not place_id:
-            return Response({"detail": "place_id is required"}, status=status.HTTP_400_BAD_REQUEST)
-        place = get_object_or_404(Place, pk=place_id)
-        CollectionItem.objects.get_or_create(collection=collection, place=place)
-        WishlistItem.objects.get_or_create(user=request.user, place=place)
-        collection.refresh_from_db()
-        return Response(WishlistCollectionSerializer(collection).data)
 
-    @action(detail=True, methods=["post"])
-    def remove_item(self, request, pk=None):
-        collection = self.get_object()
-        item_id = request.data.get("item_id")
-        if not item_id:
-            return Response({"detail": "item_id is required"}, status=status.HTTP_400_BAD_REQUEST)
-        item = get_object_or_404(CollectionItem, pk=item_id, collection=collection)
-        item.delete()
-        collection.refresh_from_db()
-        return Response(WishlistCollectionSerializer(collection).data)
+        kind = request.data.get("kind")
+        target_id = request.data.get("target_id")
+
+        if kind not in {"place"}:
+            return Response({"detail": "Invalid kind"}, status=status.HTTP_400_BAD_REQUEST)
+        if not target_id:
+            return Response({"detail": "target_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = {"collection": collection}
+
+        if kind == "place":
+            target = get_object_or_404(Place, pk=target_id)
+            data["place"] = target
+            
+        # toggle logic (add/remove)
+        item = CollectionItem.objects.filter(**data).first()
+        if item:
+            item.delete()
+            status_label = "removed"
+        else:
+            item = CollectionItem.objects.create(**data)
+            status_label = "added"
+
+        # return updated items
+        items = CollectionItem.objects.filter(collection=collection).select_related("place")
+        serializer = CollectionItemSerializer(items, many=True)
+
+        return Response({"status": status_label, "items": serializer.data})
 
 
 class PlaceReviewViewSet(viewsets.ModelViewSet):
