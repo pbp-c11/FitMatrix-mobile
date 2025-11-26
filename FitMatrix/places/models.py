@@ -151,4 +151,3 @@ class Place(models.Model):
         if isinstance(value, str):
             return [item.strip() for item in value.split(",") if item.strip()]
         return value
-

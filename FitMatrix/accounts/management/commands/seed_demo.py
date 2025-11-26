@@ -149,14 +149,17 @@ class Command(BaseCommand):
                 if random.random() > 0.5:
                     booking.status = Booking.Status.COMPLETED
                     booking.save(update_fields=["status"])
+
                     rating = random.randint(3, 5)
-                    Review.objects.get_or_create(
-                        booking=booking,
+
+                    Review.objects.create(
                         user=user,
-                        trainer=slot.trainer,
-                        defaults={"rating": rating, "comment": "Great session!"},
+                        place=booking.slot.place,
+                        rating=rating,
+                        body="Great session!",
                     )
-                    reviews_created += 1
+
+                    reviews_created += 1    
         self.stdout.write(f"- Created sample bookings and {reviews_created} reviews")
 
         # ---- Wishlists -------------------------------------------------------

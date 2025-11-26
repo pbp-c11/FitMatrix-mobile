@@ -1,18 +1,17 @@
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render, redirect
-
 from places.models import Place
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, render, redirect
 from django.template.loader import render_to_string
 from django.db.models import Avg
-
-from .models import Review
+from reviews.models import Review
 
 
 @login_required
 def review_list(request):
     reviews = Review.objects.filter(user=request.user)
     return render(request, "reviews/list.html", {"reviews": reviews})
+
 
 # Partial untuk reviews (AJAX / fragment)
 def place_reviews_partial(request, slug):
@@ -62,4 +61,3 @@ def place_review_create(request, slug):
         return redirect("places:detail", slug=place.slug)
 
     return JsonResponse({"success": False, "error": "Invalid request method."}, status=400)
-

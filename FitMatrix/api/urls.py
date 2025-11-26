@@ -11,7 +11,6 @@ from .views import (
     PlaceViewSet,
     RegisterView,
     SessionSlotViewSet,
-    TrainerReviewViewSet,
     TrainerViewSet,
     WishlistCollectionViewSet,
     WishlistViewSet,
@@ -25,7 +24,6 @@ router.register("bookings", BookingViewSet, basename="bookings")
 router.register("wishlist", WishlistViewSet, basename="wishlist")
 router.register("collections", WishlistCollectionViewSet, basename="collections")
 router.register("place-reviews", PlaceReviewViewSet, basename="place-reviews")
-router.register("trainer-reviews", TrainerReviewViewSet, basename="trainer-reviews")
 
 urlpatterns = [
     path("auth/register/", RegisterView.as_view(), name="api-register"),

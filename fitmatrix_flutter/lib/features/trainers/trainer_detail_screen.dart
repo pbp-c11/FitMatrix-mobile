@@ -19,9 +19,6 @@ final trainerSlotsProvider = FutureProvider.family<List<SessionSlot>, int>((ref,
   return ref.read(apiServiceProvider).fetchTrainerSlots(id);
 });
 
-final trainerReviewsProvider = FutureProvider.family<List<Review>, int>((ref, id) {
-  return ref.read(apiServiceProvider).fetchTrainerReviews(id);
-});
 
 class TrainerDetailScreen extends ConsumerWidget {
   const TrainerDetailScreen({super.key, required this.id});
@@ -47,7 +44,6 @@ class _TrainerBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final slots = ref.watch(trainerSlotsProvider(trainer.id));
-    final reviews = ref.watch(trainerReviewsProvider(trainer.id));
     final auth = ref.watch(authControllerProvider);
 
     return SingleChildScrollView(
@@ -141,19 +137,6 @@ class _TrainerBody extends ConsumerWidget {
               children: [
                 Text('Recent feedback', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
-                reviews.when(
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (err, _) => Text('Failed to load reviews: $err'),
-                  data: (items) => Column(
-                    children: items
-                        .map((r) => ListTile(
-                              title: Text(r.author),
-                              subtitle: Text(r.body),
-                              trailing: Chip(label: Text('${r.rating}/5')),
-                            ))
-                        .toList(),
-                  ),
-                ),
               ],
             ),
           ),

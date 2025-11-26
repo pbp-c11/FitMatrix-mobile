@@ -11,8 +11,7 @@ from accounts.models import (
     WishlistCollection,
     WishlistItem,
 )
-from reviews.models import Review as PlaceReview
-from places.models import Place
+from places.models import Place, Review as PlaceReview
 from reviews.models import Review as TrainerReview
 from scheduling.models import Booking, SessionSlot, Trainer
 
@@ -290,34 +289,3 @@ class PlaceReviewSerializer(serializers.ModelSerializer):
         place: Place = self.context["place"]
         return PlaceReview.objects.create(user=user, place=place, **validated_data)
 
-
-class TrainerReviewSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-
-    class Meta:
-        model = TrainerReview
-        fields = ["id", "user", "trainer", "booking", "rating", "comment", "created_at", "is_visible"]
-        read_only_fields = ["id", "user", "created_at", "is_visible"]
-
-    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
-        booking = attrs.get("booking")
-        trainer = attrs.get("trainer")
-        request = self.context.get("request")
-        user = getattr(request, "user", None)
-        if not booking:
-            raise serializers.ValidationError({"booking": "Booking is required."})
-        if booking.user != user:
-            raise serializers.ValidationError({"booking": "You can only review your own booking."})
-        if booking.status != Booking.Status.COMPLETED:
-            raise serializers.ValidationError({"booking": "Only completed bookings can be reviewed."})
-        if booking.review_id:
-            raise serializers.ValidationError({"booking": "This booking already has a review."})
-        if trainer and booking.slot.trainer_id != trainer.id:
-            raise serializers.ValidationError({"trainer": "Trainer mismatch for this booking."})
-        return attrs
-
-    def create(self, validated_data: dict[str, Any]) -> TrainerReview:
-        request = self.context.get("request")
-        user = getattr(request, "user", None)
-        validated_data["user"] = user
-        return super().create(validated_data)

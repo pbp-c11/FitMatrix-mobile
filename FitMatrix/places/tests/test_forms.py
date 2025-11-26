@@ -3,9 +3,10 @@ from __future__ import annotations
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from places.forms import ReviewForm
-from places.models import Place
+from reviews.forms import ReviewForm
 from reviews.models import Review
+from places.models import Place
+
 User = get_user_model()
 
 

@@ -112,11 +112,6 @@ class ApiService {
     await _dio.post('place-reviews/', data: {'place': slug, 'rating': rating, 'body': body});
   }
 
-  Future<List<Review>> fetchTrainerReviews(int trainerId) async {
-    final res = await _dio.get('trainer-reviews/', queryParameters: {'trainer': trainerId});
-    return _asList(res.data).map((e) => Review.fromJson(e as Map<String, dynamic>)).toList();
-  }
-
   List<dynamic> _asList(dynamic data) {
     if (data is List) return data;
     if (data is Map<String, dynamic>) {
