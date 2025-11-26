@@ -18,9 +18,9 @@ from accounts.models import (
     WishlistCollection,
     WishlistItem,
 )
-from places.models import Place, Review as PlaceReview
+from places.models import Place
 from places.services import newest_places, search_places, spotlight_places
-from reviews.models import Review as TrainerReview
+from reviews.models import Review as PlaceReview
 from scheduling.models import Booking, SessionSlot, Trainer
 
 from .serializers import (
@@ -32,7 +32,6 @@ from .serializers import (
     PlaceSummarySerializer,
     RegisterSerializer,
     SessionSlotSerializer,
-    TrainerReviewSerializer,
     TrainerSerializer,
     TrainerSummarySerializer,
     UserSerializer,
@@ -396,23 +395,3 @@ class PlaceReviewViewSet(viewsets.ModelViewSet):
         serializer.context["place"] = place
         serializer.save()
 
-
-class TrainerReviewViewSet(viewsets.ModelViewSet):
-    serializer_class = TrainerReviewSerializer
-
-    def get_permissions(self):
-        if self.action in {"create", "update", "partial_update", "destroy"}:
-            return [permissions.IsAuthenticated()]
-        return [permissions.AllowAny()]
-
-    def get_queryset(self):
-        trainer_id = self.request.query_params.get("trainer")
-        qs = TrainerReview.objects.select_related("user", "trainer", "booking")
-        if trainer_id:
-            qs = qs.filter(trainer_id=trainer_id)
-        if not (self.request.user.is_staff or getattr(self.request.user, "is_admin", False)):
-            qs = qs.filter(is_visible=True)
-        return qs.order_by("-created_at")
-
-    def perform_create(self, serializer):
-        serializer.save()
