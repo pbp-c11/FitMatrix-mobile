@@ -1,3 +1,4 @@
+import 'package:fitmatrix_flutter/data/providers/collections_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme.dart';
 import '../../data/api_service.dart';
 import '../../data/auth_controller.dart';
-import '../../data/models/wishlist.dart';
+import '../../data/models/wishlist_item.dart';
 import '../../widgets/matrix_button.dart';
 import '../../widgets/matrix_card.dart';
 import '../../widgets/matrix_scaffold.dart';
@@ -39,24 +40,40 @@ class WishlistScreen extends ConsumerWidget {
       );
     }
 
-    final wishlist = ref.watch(wishlistProvider);
+    final collections = ref.watch(collectionsProvider);
+
     return MatrixScaffold(
-      body: wishlist.when(
+      body: collections.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Unable to load wishlist: $err')),
+        error: (err, _) =>
+            Center(child: Text('Unable to load wishlist: $err')),
         data: (items) => ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 20),
           children: [
             Text(
               'Wishlist',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+              style: Theme.of(context)
+                  .textTheme
+                  .headlineSmall
+                  ?.copyWith(fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 12),
             if (items.isEmpty)
-              const Text('No favourites yet.', style: TextStyle(color: MatrixColors.muted))
+              const Text(
+                'No favourites yet.',
+                style: TextStyle(color: MatrixColors.muted),
+              )
             else
-              ...items.map((item) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6),
+              ...items.map(
+                (c) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: GestureDetector(
+                    onTap: () {
+                      context.go(
+                        '/wishlist/collection/${c.id}',
+                        extra: c,
+                      );
+                    },
                     child: MatrixCard(
                       child: Row(
                         children: [
@@ -65,33 +82,41 @@ class WishlistScreen extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  item.place?.name ?? item.trainer?.name ?? '',
+                                  c.name,
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleMedium
                                       ?.copyWith(fontWeight: FontWeight.w700),
                                 ),
+                                if (c.description != null &&
+                                    c.description!.isNotEmpty)
+                                  Text(
+                                    c.description!,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          color: MatrixColors.muted,
+                                        ),
+                                  ),
                                 Text(
-                                  item.place?.city ??
-                                      item.trainer?.specialties ??
-                                      '',
+                                  '${c.items.length} places',
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodySmall
-                                      ?.copyWith(color: MatrixColors.muted),
+                                      ?.copyWith(
+                                        color: MatrixColors.muted,
+                                      ),
                                 ),
                               ],
                             ),
                           ),
-                          MatrixButton(
-                            label: 'Remove',
-                            variant: MatrixButtonVariant.ghost,
-                            onPressed: () => _toggle(ref, item),
-                          ),
                         ],
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

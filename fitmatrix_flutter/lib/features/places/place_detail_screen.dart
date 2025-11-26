@@ -11,6 +11,8 @@ import '../../data/models/review.dart';
 import '../../widgets/matrix_button.dart';
 import '../../widgets/matrix_card.dart';
 import '../../widgets/matrix_scaffold.dart';
+import '../../data/providers/collections_provider.dart';
+
 
 final placeDetailProvider = FutureProvider.family<Place, String>((ref, slug) {
   return ref.read(apiServiceProvider).fetchPlaceDetail(slug);
@@ -37,6 +39,129 @@ class PlaceDetailScreen extends ConsumerWidget {
     );
   }
 }
+
+class _CollectionSelector extends ConsumerWidget {
+  final int placeId;
+
+  const _CollectionSelector({required this.placeId});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final collections = ref.watch(collectionsProvider);
+
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: collections.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Text("Error loading collections: $e"),
+        data: (items) => Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Add to Collection",
+                style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 12),
+
+            // Tombol buat collection baru
+            MatrixButton(
+              label: "+ Create New Collection",
+              variant: MatrixButtonVariant.ghost,
+              onPressed: () => _openCreateCollection(context, ref),
+            ),
+
+            const SizedBox(height: 10),
+
+            // List Collections
+            ...items.map((c) => ListTile(
+                  title: Text(c.name),
+                  onTap: () => _addToCollection(ref, context, c.id),
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _addToCollection(
+      WidgetRef ref, BuildContext context, int collectionId) async {
+    final api = ref.read(apiServiceProvider);
+
+    await api.addToCollection(collectionId, "place", placeId);
+
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Added to collection")),
+    );
+  }
+
+  void _openCreateCollection(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (_) => _CreateCollectionDialog(placeId: placeId),
+    );
+  }
+}
+
+class _CreateCollectionDialog extends ConsumerStatefulWidget {
+  final int placeId;
+
+  const _CreateCollectionDialog({required this.placeId});
+
+  @override
+  ConsumerState<_CreateCollectionDialog> createState() =>
+      _CreateCollectionDialogState();
+}
+
+class _CreateCollectionDialogState
+    extends ConsumerState<_CreateCollectionDialog> {
+  final ctrl = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Create New Collection"),
+      content: TextField(
+        controller: ctrl,
+        decoration: const InputDecoration(labelText: "Collection Name"),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+        TextButton(
+        onPressed: () async {
+          final api = ref.read(apiServiceProvider);
+
+          final newCollection = await api.createCollection(ctrl.text);
+
+          await api.addToCollection(
+            newCollection.id,
+            "place",
+            widget.placeId,
+          );
+
+          // Tutup dialog
+          Navigator.of(context).pop();
+
+          // // Tutup bottom sheet
+          // Navigator.of(context).pop();
+
+          // ide:
+          // 1. menjalankan funct
+
+          // Refresh provider
+          ref.invalidate(collectionsProvider);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Added to new collection")),
+          );
+        },
+        child: const Text("Create"),
+      ),
+          
+      ],
+    );
+  }
+}
+
 
 class _PlaceDetailBody extends ConsumerWidget {
   const _PlaceDetailBody({required this.place});
@@ -112,7 +237,7 @@ class _PlaceDetailBody extends ConsumerWidget {
                             label: 'Add to wishlist',
                             variant: MatrixButtonVariant.ghost,
                             onPressed: auth.state.isAuthenticated
-                                ? () => _toggleWishlist(context, ref)
+                                ? () => _openCollectionSheet(context, ref)
                                 : () => ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(content: Text('Login to save this place')),
                                     ),
@@ -180,6 +305,19 @@ class _PlaceDetailBody extends ConsumerWidget {
       const SnackBar(content: Text('Pick a trainer slot from Sessions to book this venue.')),
     );
   }
+
+  void _openCollectionSheet(BuildContext context, WidgetRef ref) async {
+  showModalBottomSheet(
+    context: context,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+    ),
+    builder: (_) => _CollectionSelector(
+      placeId: place.id,
+    ),
+  );
+}
+
 
   void _openMaps(String url) {
     // Placeholder for url_launcher; keep as info for now.
