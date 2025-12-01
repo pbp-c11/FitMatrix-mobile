@@ -20,6 +20,11 @@ final placeReviewsProvider = FutureProvider.family<List<Review>, String>((ref, s
   return ref.read(apiServiceProvider).fetchPlaceReviews(slug);
 });
 
+// final placesProvider = FutureProvider<List<Place>>((ref) {
+//   return ref.read(apiServiceProvider).fetchPlaces();
+// });
+
+
 class PlaceDetailScreen extends ConsumerWidget {
   const PlaceDetailScreen({super.key, required this.slug});
   final String slug;
@@ -87,9 +92,34 @@ class _PlaceDetailBody extends ConsumerWidget {
                         backgroundColor: MatrixColors.mint.withOpacity(0.4),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        place.name,
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              place.name,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: [
+                              Chip(
+                                label: Text(
+                                  'Rating ${place.ratingAvg.toStringAsFixed(1)}',
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              ),
+                            ],
+                          )
+                        ],
                       ),
                       const SizedBox(height: 6),
                       Text(
@@ -275,6 +305,9 @@ class _PlaceReviewsState extends ConsumerState<_PlaceReviews> {
     final api = ref.read(apiServiceProvider);
     await api.submitPlaceReview(widget.slug, _rating, _body.text.trim());
     ref.invalidate(placeReviewsProvider(widget.slug));
+    ref.invalidate(placeDetailProvider(widget.slug));
+    // ref.invalidate(placesProvider);
+
     _body.clear();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
