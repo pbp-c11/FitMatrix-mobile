@@ -141,11 +141,6 @@ class _CreateCollectionDialogState
           // Tutup dialog
           Navigator.of(context).pop();
 
-          // // Tutup bottom sheet
-          // Navigator.of(context).pop();
-
-          // ide:
-          // 1. menjalankan funct
 
           // Refresh provider
           ref.invalidate(collectionsProvider);

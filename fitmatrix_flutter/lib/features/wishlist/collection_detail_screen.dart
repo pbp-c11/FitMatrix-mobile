@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart'; 
 
 import '../../widgets/matrix_card.dart';
 import '../../widgets/matrix_scaffold.dart';
@@ -8,7 +9,7 @@ import '../../core/theme.dart';
 import '../../data/models/wishlist_collection.dart';
 import '../../data/models/wishlist_item.dart';
 import '../../data/api_service.dart';
-import '../../data/providers/collections_provider.dart'; 
+import '../../data/providers/collections_provider.dart';
 
 class CollectionDetailScreen extends ConsumerStatefulWidget {
   final WishlistCollection collection;
@@ -39,7 +40,7 @@ class _CollectionDetailScreenState
       builder: (ctx) => AlertDialog(
         title: const Text('Remove from collection?'),
         content: Text(
-          'Remove "${item.place?.name ?? item.trainer?.name ?? ''}"from this collection?',
+          'Remove "${item.place?.name ?? item.trainer?.name ?? ''}" from this collection?',
         ),
         actions: [
           TextButton(
@@ -57,14 +58,14 @@ class _CollectionDetailScreenState
     if (confirm != true) return;
 
     try {
-      // pakai id dari WishlistItem 
-      await ref.read(apiServiceProvider).deleteCollectionItem(widget.collection.id, item.id);
+      await ref
+          .read(apiServiceProvider)
+          .deleteCollectionItem(widget.collection.id, item.id);
 
       setState(() {
         _items.removeWhere((it) => it.id == item.id);
       });
 
-      // supaya jumlah "X places" di halaman wishlist utama ikut update
       ref.invalidate(collectionsProvider);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -83,7 +84,12 @@ class _CollectionDetailScreenState
 
     return MatrixScaffold(
       body: ListView(
-        padding: const EdgeInsets.only(top: 12, bottom: 20),
+        padding: const EdgeInsets.only(
+          top: 12,
+          bottom: 20,
+          left: 16,
+          right: 16,
+        ),
         children: [
           Text(
             collection.name,
@@ -103,50 +109,83 @@ class _CollectionDetailScreenState
                   ?.copyWith(color: MatrixColors.muted),
             ),
           const SizedBox(height: 12),
+
           if (_items.isEmpty)
             const Text(
               'No places in this collection yet.',
               style: TextStyle(color: MatrixColors.muted),
             )
           else
-            ..._items.map(
-              (WishlistItem item) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
-                child: MatrixCard(
-                  child: Row(
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate:
+                  const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                mainAxisExtent: 140,
+              ),
+              itemCount: _items.length,
+              itemBuilder: (context, index) {
+                final item = _items[index];
+                final name = item.place?.name ?? item.trainer?.name ?? '';
+                final subtitle =
+                    item.place?.city ?? item.trainer?.specialties ?? '';
+
+                return MatrixCard(
+                  padding: const EdgeInsets.all(12),
+                  onTap: () {
+                    // 👉 klik card / judul → ke detail
+                    if (item.place != null) {
+                      // kalau route-mu pakai slug:
+                      context.go('/places/${item.place!.slug}');
+                      // kalau route-mu pakai id, pakai ini:
+                      // context.go('/places/${item.place!.id}');
+                    } else if (item.trainer != null) {
+                      context.go('/trainers/${item.trainer!.id}');
+                    }
+                  },
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item.place?.name ?? item.trainer?.name ?? '',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.w700),
-                            ),
-                            Text(
-                              item.place?.city ??
-                                  item.trainer?.specialties ??
-                                  '',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(color: MatrixColors.muted),
-                            ),
-                          ],
-                        ),
+                      Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline),
-                        onPressed: () => _removeItem(item),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(color: MatrixColors.muted),
+                      ),
+                      const SizedBox(height: 4),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            size: 18,
+                          ),
+                          onPressed: () => _removeItem(item),
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ),
+                );
+              },
             ),
         ],
       ),
