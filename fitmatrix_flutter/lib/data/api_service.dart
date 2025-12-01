@@ -105,17 +105,26 @@ class ApiService {
   }
 
   
-Future<void> addToCollection(int collectionId, String kind, int targetId) async {
-  await _dio.post('collections/$collectionId/add/', data: {
-    'kind': kind,
-    'target_id': targetId,
-  });
-}
+  Future<void> addToCollection(int collectionId, String kind, int targetId) async {
+    await _dio.post('collections/$collectionId/add/', data: {
+      'kind': kind,
+      'target_id': targetId,
+    });
+  }
 
-Future<WishlistCollection> createCollection(String name) async {
-  final res = await _dio.post('collections/', data: {'name': name});
-  return WishlistCollection.fromJson(res.data);
-}
+
+  Future<WishlistCollection> createCollection(String name) async {
+    final res = await _dio.post('collections/', data: {'name': name});
+    return WishlistCollection.fromJson(res.data);
+  }
+
+  Future<void> deleteWishlistCollection(int collectionId) async{
+    await _dio.post('collections/$collectionId/delete/');
+  }
+
+  Future<void> deleteCollectionItem(int collectionId, int itemId) async {
+    await _dio.post('collections/$collectionId/items/$itemId/delete/');
+  }
 
   Future<List<Review>> fetchPlaceReviews(String slug) async {
     final res = await _dio.get('place-reviews/', queryParameters: {'place': slug});

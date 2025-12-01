@@ -19,7 +19,7 @@ class MatrixCard extends StatelessWidget {
     final content = Container(
       padding: padding ?? const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(0),
         color: MatrixColors.card,
         border: Border.all(color: MatrixColors.border),
         boxShadow: const [

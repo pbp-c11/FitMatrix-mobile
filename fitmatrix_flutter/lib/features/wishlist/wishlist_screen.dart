@@ -111,6 +111,48 @@ class WishlistScreen extends ConsumerWidget {
                               ],
                             ),
                           ),
+
+                          // delete collection button
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text('Delete collection?'),
+                                  content: Text(
+                                    'Are you sure you want to delete "${c.name}" and all of the places inside as well?',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(false),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(true),
+                                      child: const Text('Delete'),
+                                    ),
+                                  ],
+                                ),
+                              );
+
+                              if (confirm != true) return;
+
+                              try {
+                                await ref.read(apiServiceProvider).deleteWishlistCollection(c.id);
+                                // refresh collections list
+                                ref.invalidate(collectionsProvider);
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Collection deleted')),
+                                );
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Gagal delete: $e')),
+                                );
+                              }
+                            },
+                          ),
                         ],
                       ),
                     ),
