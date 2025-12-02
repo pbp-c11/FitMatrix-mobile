@@ -60,10 +60,11 @@ class ApiService {
     return _asList(res.data).map((e) => SessionSlot.fromJson(e as Map<String, dynamic>)).toList();
   }
 
-  Future<List<SessionSlot>> fetchSessions({String? query, int? trainerId}) async {
+  Future<List<SessionSlot>> fetchSessions({String? query, int? trainerId, String? placeSlug}) async {
     final res = await _dio.get('sessions/', queryParameters: {
       if (query?.isNotEmpty ?? false) 'q': query,
       if (trainerId != null) 'trainer': trainerId,
+      if (placeSlug?.isNotEmpty ?? false) 'place': placeSlug,
     });
     return _asList(res.data).map((e) => SessionSlot.fromJson(e as Map<String, dynamic>)).toList();
   }

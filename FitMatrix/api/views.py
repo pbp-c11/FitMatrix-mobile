@@ -238,6 +238,8 @@ class SessionSlotViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         query = self.request.query_params.get("q", "").strip()
         trainer_id = self.request.query_params.get("trainer")
+        place_slug = self.request.query_params.get("place")
+        place_id = self.request.query_params.get("place_id")
         qs = SessionSlot.objects.select_related("trainer", "place")
         if not (self.request.user.is_staff or getattr(self.request.user, "is_admin", False)):
             qs = qs.filter(is_active=True, start__gte=timezone.now())
@@ -249,6 +251,10 @@ class SessionSlotViewSet(viewsets.ModelViewSet):
             )
         if trainer_id:
             qs = qs.filter(trainer_id=trainer_id)
+        if place_slug:
+            qs = qs.filter(place__slug=place_slug)
+        if place_id:
+            qs = qs.filter(place_id=place_id)
         return qs.order_by("start")
 
 

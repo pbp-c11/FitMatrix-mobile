@@ -119,6 +119,7 @@ class PlaceListScreen extends ConsumerWidget {
                     return PlaceCard(
                       place: place,
                       onTap: () => context.go('/places/${place.slug}'),
+                      compact: true,
                     );
                   },
                 ),
