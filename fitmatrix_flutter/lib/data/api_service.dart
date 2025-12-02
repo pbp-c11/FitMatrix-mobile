@@ -92,16 +92,38 @@ class ApiService {
     return _asList(res.data).map((e) => WishlistItem.fromJson(e as Map<String, dynamic>)).toList();
   }
 
-  Future<String> toggleWishlist(String kind, int targetId) async {
-    final res = await _dio.post('wishlist/', data: {'kind': kind, 'target_id': targetId});
-    return res.data['status'] as String? ?? 'added';
-  }
-
   Future<List<WishlistCollection>> fetchCollections() async {
     final res = await _dio.get('collections/');
     return _asList(res.data)
         .map((e) => WishlistCollection.fromJson(e as Map<String, dynamic>))
         .toList();
+  }
+
+  Future<WishlistCollection> createCollection(
+    String name, {
+    String? description,
+  }) async {
+    final res = await _dio.post('collections/', data: {
+      'name': name,
+      if (description != null && description.isNotEmpty) 'description': description,
+    });
+    return WishlistCollection.fromJson(res.data as Map<String, dynamic>);
+  }
+
+  Future<WishlistCollection> addToCollection(
+    int collectionId,
+    String kind,
+    int targetId,
+  ) async {
+    final res = await _dio.post('collections/$collectionId/add_item/', data: {
+      'place_id': targetId,
+    });
+    return WishlistCollection.fromJson(res.data as Map<String, dynamic>);
+  }
+
+  Future<String> toggleWishlist(String kind, int targetId) async {
+    final res = await _dio.post('wishlist/', data: {'kind': kind, 'target_id': targetId});
+    return res.data['status'] as String? ?? 'added';
   }
 
   Future<List<Review>> fetchPlaceReviews(String slug) async {

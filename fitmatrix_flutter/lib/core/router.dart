@@ -1,9 +1,8 @@
-import 'package:fitmatrix_flutter/data/models/wishlist_collection.dart';
-import 'package:fitmatrix_flutter/features/wishlist/collection_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../data/models/wishlist.dart';
 import '../data/auth_controller.dart';
 import '../widgets/matrix_background.dart';
 import '../widgets/matrix_nav_bar.dart';
@@ -18,6 +17,7 @@ import '../features/profile/profile_screen.dart';
 import '../features/sessions/sessions_screen.dart';
 import '../features/trainers/trainer_detail_screen.dart';
 import '../features/trainers/trainer_list_screen.dart';
+import '../features/wishlist/collection_detail_screen.dart';
 import '../features/wishlist/wishlist_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
