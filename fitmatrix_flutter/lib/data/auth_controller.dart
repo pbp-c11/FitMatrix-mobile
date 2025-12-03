@@ -166,6 +166,63 @@ class AuthController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<User?> updateProfile({
+    String? displayName,
+    String? email,
+    MultipartFile? avatar,
+  }) async {
+    if (_state.accessToken == null) return null;
+    if ((displayName == null || displayName.isEmpty) &&
+        (email == null || email.isEmpty) &&
+        avatar == null) {
+      return _state.user;
+    }
+
+    _state = _state.copyWith(loading: true, clearError: true);
+    notifyListeners();
+    try {
+      final formData = FormData();
+      if (displayName != null && displayName.isNotEmpty) {
+        formData.fields.add(MapEntry('display_name', displayName));
+      }
+      if (email != null && email.isNotEmpty) {
+        formData.fields.add(MapEntry('email', email));
+      }
+      if (avatar != null) {
+        formData.files.add(MapEntry('avatar', avatar));
+      }
+
+      final res = await _dio.patch(
+        '${AppConfig.apiBaseUrl}auth/me/',
+        data: formData,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer ${_state.accessToken}',
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
+      );
+      final user = User.fromJson(res.data as Map<String, dynamic>);
+      _state = _state.copyWith(user: user, loading: false, clearError: true);
+      notifyListeners();
+      return user;
+    } on DioException catch (err) {
+      _state = _state.copyWith(
+        loading: false,
+        error: _extractError(err, 'Failed to update profile'),
+      );
+      notifyListeners();
+      return null;
+    } catch (_) {
+      _state = _state.copyWith(
+        loading: false,
+        error: 'Failed to update profile',
+      );
+      notifyListeners();
+      return null;
+    }
+  }
+
   Future<User> _fetchMe(String accessToken) async {
     final res = await _dio.get(
       '${AppConfig.apiBaseUrl}auth/me/',

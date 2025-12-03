@@ -38,6 +38,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            TextButton.icon(
+              onPressed: () => context.go('/home'),
+              style: TextButton.styleFrom(
+                foregroundColor: MatrixColors.muted,
+                padding: EdgeInsets.zero,
+              ),
+              icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+              label: const Text('Back to home'),
+            ),
             const SizedBox(height: 18),
             Text(
               'FITMATRIX',
@@ -102,11 +111,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     TextButton(
                       onPressed: () => context.go('/register'),
                       child: const Text('Create account'),
-                    ),
-                    const SizedBox(height: 4),
-                    TextButton(
-                      onPressed: () => context.go('/home'),
-                      child: const Text('Continue as guest'),
                     ),
                   ],
                 ),

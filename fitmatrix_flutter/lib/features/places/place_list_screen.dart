@@ -111,7 +111,7 @@ class PlaceListScreen extends ConsumerWidget {
                     crossAxisCount: 2,
                     mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
-                    mainAxisExtent: 320,
+                    mainAxisExtent: 300,
                   ),
                   itemCount: items.length,
                   itemBuilder: (context, index) {
@@ -119,6 +119,7 @@ class PlaceListScreen extends ConsumerWidget {
                     return PlaceCard(
                       place: place,
                       onTap: () => context.go('/places/${place.slug}'),
+                      compact: true,
                     );
                   },
                 ),

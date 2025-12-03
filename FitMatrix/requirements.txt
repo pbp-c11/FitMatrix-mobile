@@ -9,3 +9,4 @@ python-dotenv
 coverage
 djangorestframework
 djangorestframework-simplejwt
+django-cors-headers

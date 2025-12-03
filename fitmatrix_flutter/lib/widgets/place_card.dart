@@ -28,95 +28,76 @@ class PlaceCard extends StatelessWidget {
           (place.gallery.isNotEmpty ? place.gallery.first : null),
     );
     final isSvg = heroUrl != null && heroUrl.toLowerCase().endsWith('.svg');
-    return MatrixCard(
-      onTap: onTap,
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(18),
-            child: Stack(
-              children: [
-                AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: (heroUrl == null || isSvg)
-                      ? Container(color: MatrixColors.mint.withOpacity(0.4))
-                      : CachedNetworkImage(
-                          imageUrl: heroUrl,
-                          fit: BoxFit.cover,
-                          placeholder: (context, _) => Container(
-                            color: MatrixColors.mint.withOpacity(0.3),
-                          ),
-                          errorWidget: (context, _, __) => Container(
-                            color: MatrixColors.mint.withOpacity(0.4),
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final hasBoundedHeight =
+            constraints.hasBoundedHeight && constraints.maxHeight.isFinite;
+        final showDescription =
+            !compact && (!hasBoundedHeight || constraints.maxHeight >= 320);
+        final details = _DetailsSection(
+          place: place,
+          showDescription: showDescription,
+          constrained: hasBoundedHeight,
+          trailing: trailing,
+          onTap: onTap,
+        );
+
+        return MatrixCard(
+          onTap: onTap,
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: hasBoundedHeight
+                ? MainAxisSize.max
+                : MainAxisSize.min,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Stack(
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: (heroUrl == null || isSvg)
+                          ? Container(color: MatrixColors.mint.withOpacity(0.4))
+                          : CachedNetworkImage(
+                              imageUrl: heroUrl,
+                              fit: BoxFit.cover,
+                              placeholder: (context, _) => Container(
+                                color: MatrixColors.mint.withOpacity(0.3),
+                              ),
+                              errorWidget: (context, _, __) => Container(
+                                color: MatrixColors.mint.withOpacity(0.4),
+                              ),
+                            ),
+                    ),
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      child: Chip(
+                        backgroundColor: Colors.white.withOpacity(0.9),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        label: Text(
+                          place.facilityType,
+                          style: const TextStyle(
+                            color: MatrixColors.ink,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.4,
                           ),
                         ),
-                ),
-                Positioned(
-                  top: 10,
-                  left: 10,
-                  child: Chip(
-                    backgroundColor: Colors.white.withOpacity(0.9),
-                    label: Text(
-                      place.facilityType,
-                      style: const TextStyle(
-                        color: MatrixColors.ink,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.4,
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            place.name,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: MatrixColors.ink,
-              fontWeight: FontWeight.w800,
-            ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '${place.city} | ${place.priceDisplay}',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: MatrixColors.muted),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 8),
-          if (!compact)
-            Text(
-              place.summary ?? place.tagline ?? 'Premium multi-zone facility.',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Chip(
-                label: Text('${place.ratingAvg.toStringAsFixed(1)} ★'),
-                backgroundColor: MatrixColors.mint.withOpacity(0.35),
               ),
-              trailing ??
-                  MatrixButton(
-                    label: 'View',
-                    variant: MatrixButtonVariant.ghost,
-                    onPressed: onTap,
-                  ),
+              const SizedBox(height: 10),
+              if (hasBoundedHeight) Expanded(child: details) else details,
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -134,5 +115,98 @@ class PlaceCard extends StatelessWidget {
       return '${AppConfig.mediaBaseUrl}/$url';
     }
     return '${AppConfig.mediaBaseUrl}/static/$url';
+  }
+}
+
+class _DetailsSection extends StatelessWidget {
+  const _DetailsSection({
+    required this.place,
+    required this.showDescription,
+    required this.constrained,
+    this.trailing,
+    this.onTap,
+  });
+
+  final Place place;
+  final bool showDescription;
+  final bool constrained;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final mutedStyle = Theme.of(
+      context,
+    ).textTheme.bodyMedium?.copyWith(color: MatrixColors.muted);
+    final infoBlock = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          place.name,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: MatrixColors.ink,
+            fontWeight: FontWeight.w800,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '${place.city} • ${place.priceDisplay}',
+          style: mutedStyle,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        if (showDescription) ...[
+          const SizedBox(height: 8),
+          Text(
+            place.summary ?? place.tagline ?? 'Premium multi-zone facility.',
+            maxLines: constrained ? 2 : 4,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
+      ],
+    );
+
+    final header = constrained ? Expanded(child: infoBlock) : infoBlock;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: constrained ? MainAxisSize.max : MainAxisSize.min,
+      children: [
+        header,
+        const SizedBox(height: 12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Chip(
+              backgroundColor: MatrixColors.mint.withOpacity(0.3),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              label: Text(
+                '${place.ratingAvg.toStringAsFixed(1)} ★',
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child:
+                    trailing ??
+                    MatrixButton(
+                      label: 'View',
+                      variant: MatrixButtonVariant.ghost,
+                      onPressed: onTap,
+                    ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
