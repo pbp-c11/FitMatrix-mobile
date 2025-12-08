@@ -5,12 +5,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppConfig {
   static const apiBaseUrl = String.fromEnvironment(
     'FITMATRIX_API_BASE',
-    defaultValue: kIsWeb ? 'http://127.0.0.1:8001/api/' : 'http://10.0.2.2:8001/api/',
+    defaultValue: kIsWeb ? 'http://127.0.0.1:8000/api/' : 'http://10.0.2.2:8000/api/',
   );
 
   static const mediaBaseUrl = String.fromEnvironment(
     'FITMATRIX_MEDIA_BASE',
-    defaultValue: kIsWeb ? 'http://127.0.0.1:8001' : 'http://10.0.2.2:8001',
+    defaultValue: kIsWeb ? 'http://127.0.0.1:8000' : 'http://10.0.2.2:8000',
   );
   
 }

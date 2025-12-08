@@ -46,6 +46,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class MeUpdateSerializer(serializers.ModelSerializer):
+    avatar = serializers.FileField(required=False, allow_null=True)
+
     class Meta:
         model = User
         fields = ["display_name", "email", "avatar"]

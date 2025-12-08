@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../core/theme.dart';
 import '../../data/auth_controller.dart';
@@ -10,6 +12,24 @@ import '../../widgets/matrix_scaffold.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
+
+  Future<void> _changeAvatar(BuildContext context, WidgetRef ref) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (picked == null) return;
+
+    try {
+      final avatar = await MultipartFile.fromFile(
+        picked.path,
+        filename: picked.name,
+      );
+      await ref.read(authControllerProvider).updateProfile(avatar: avatar);
+      messenger.showSnackBar(const SnackBar(content: Text('Profile picture updated')));
+    } catch (_) {
+      messenger.showSnackBar(const SnackBar(content: Text('Failed to update profile picture')));
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,6 +54,10 @@ class ProfileScreen extends ConsumerWidget {
       );
     }
 
+    final avatarInitial = user.displayName.isNotEmpty
+        ? user.displayName[0].toUpperCase()
+        : user.username[0].toUpperCase();
+
     return MatrixScaffold(
       body: ListView(
         padding: const EdgeInsets.only(top: 14, bottom: 20),
@@ -41,11 +65,25 @@ class ProfileScreen extends ConsumerWidget {
           MatrixCard(
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 32,
-                  backgroundColor: MatrixColors.mint,
-                  child: Text(user.displayName.isNotEmpty ? user.displayName[0].toUpperCase() : user.username[0].toUpperCase(),
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: MatrixColors.ink)),
+                GestureDetector(
+                  onTap: () => _changeAvatar(context, ref),
+                  child: CircleAvatar(
+                    radius: 32,
+                    backgroundColor: MatrixColors.mint,
+                    backgroundImage: user.avatar != null && user.avatar!.isNotEmpty
+                        ? NetworkImage(user.avatar!)
+                        : null,
+                    child: (user.avatar == null || user.avatar!.isEmpty)
+                        ? Text(
+                            avatarInitial,
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              color: MatrixColors.ink,
+                            ),
+                          )
+                        : null,
+                  ),
                 ),
                 const SizedBox(width: 14),
                 Column(
@@ -56,6 +94,13 @@ class ProfileScreen extends ConsumerWidget {
                     Chip(
                       label: Text(user.isAdmin ? 'ADMIN' : 'USER'),
                       backgroundColor: user.isAdmin ? MatrixColors.highlight : MatrixColors.mint,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Tap avatar to change photo',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: MatrixColors.muted,
+                          ),
                     ),
                   ],
                 ),

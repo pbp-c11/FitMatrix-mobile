@@ -113,7 +113,10 @@ class HomeSummaryView(APIView):
         summary = {
             "place_count": Place.objects.filter(is_active=True).count(),
             "studio_count": Place.objects.filter(is_active=True, facility_type=Place.FacilityType.STUDIO).count(),
-            "trainer_count": Trainer.objects.filter(is_active=True).count(),
+            "trainer_count": Place.objects.filter(
+                is_active=True,
+                facility_type__in=[Place.FacilityType.GYM, Place.FacilityType.STUDIO],
+            ).count(),
         }
         trending = (
             Place.objects.filter(is_active=True)

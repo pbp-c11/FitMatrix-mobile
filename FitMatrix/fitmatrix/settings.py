@@ -34,7 +34,7 @@ def _load_secret_key() -> str:
 
 
 SECRET_KEY = _load_secret_key()
-DEBUG = os.getenv("DJANGO_DEBUG", "false").lower() == "true"
+DEBUG = os.getenv("DJANGO_DEBUG", "false").lower() == "false"
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -99,6 +99,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "corsheaders.middleware.CorsMiddleware"
 ]
 
 ROOT_URLCONF = "fitmatrix.urls"
