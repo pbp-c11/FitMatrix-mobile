@@ -7,7 +7,8 @@ import 'models/place.dart';
 import 'models/review.dart';
 import 'models/session_slot.dart';
 import 'models/trainer.dart';
-import 'models/wishlist.dart';
+import 'models/wishlist_item.dart';
+import 'models/wishlist_collection.dart';
 import 'secured_client.dart';
 
 class ApiService {
@@ -101,6 +102,28 @@ class ApiService {
     return _asList(res.data)
         .map((e) => WishlistCollection.fromJson(e as Map<String, dynamic>))
         .toList();
+  }
+
+  
+  Future<void> addToCollection(int collectionId, String kind, int targetId) async {
+    await _dio.post('collections/$collectionId/add/', data: {
+      'kind': kind,
+      'target_id': targetId,
+    });
+  }
+
+
+  Future<WishlistCollection> createCollection(String name) async {
+    final res = await _dio.post('collections/', data: {'name': name});
+    return WishlistCollection.fromJson(res.data);
+  }
+
+  Future<void> deleteWishlistCollection(int collectionId) async{
+    await _dio.post('collections/$collectionId/delete/');
+  }
+
+  Future<void> deleteCollectionItem(int collectionId, int itemId) async {
+    await _dio.post('collections/$collectionId/items/$itemId/delete/');
   }
 
   Future<List<Review>> fetchPlaceReviews(String slug) async {

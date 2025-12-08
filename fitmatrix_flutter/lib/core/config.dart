@@ -7,10 +7,12 @@ class AppConfig {
     'FITMATRIX_API_BASE',
     defaultValue: kIsWeb ? 'http://127.0.0.1:8001/api/' : 'http://10.0.2.2:8001/api/',
   );
+
   static const mediaBaseUrl = String.fromEnvironment(
     'FITMATRIX_MEDIA_BASE',
     defaultValue: kIsWeb ? 'http://127.0.0.1:8001' : 'http://10.0.2.2:8001',
   );
+  
 }
 
 final sharedPrefsProvider = Provider<SharedPreferences>(

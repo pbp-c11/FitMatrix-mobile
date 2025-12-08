@@ -1,3 +1,5 @@
+import 'package:fitmatrix_flutter/data/models/wishlist_collection.dart';
+import 'package:fitmatrix_flutter/features/wishlist/collection_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -106,6 +108,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/wishlist',
             name: 'wishlist',
             builder: (context, state) => const WishlistScreen(),
+          ),
+
+          GoRoute(
+            path: '/wishlist/collection/:id',
+            name:'collection-detail',
+            builder: (context, state){
+              final collection = state.extra as WishlistCollection;
+              return CollectionDetailScreen(collection: collection);
+            },
           ),
           GoRoute(
             path: '/bookings',

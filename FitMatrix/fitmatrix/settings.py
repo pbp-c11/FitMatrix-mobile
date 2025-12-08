@@ -63,6 +63,7 @@ CORS_ALLOWED_ORIGINS = [
 
 CORS_ALLOW_ALL_ORIGINS = True # For development ease, can be removed in production
 
+
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
@@ -85,7 +86,7 @@ INSTALLED_APPS = [
     "wishlist",
     "reviews",
     "api",
-    "corsheaders",
+    "corsheaders"
 ]
 
 MIDDLEWARE = [
@@ -98,6 +99,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "corsheaders.middleware.CorsMiddleware"
 ]
 
 ROOT_URLCONF = "fitmatrix.urls"

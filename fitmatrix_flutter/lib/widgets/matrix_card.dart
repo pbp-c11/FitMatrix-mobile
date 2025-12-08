@@ -19,7 +19,7 @@ class MatrixCard extends StatelessWidget {
     final content = Container(
       padding: padding ?? const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.zero,
         color: MatrixColors.card,
         border: Border.all(color: MatrixColors.border),
         boxShadow: const [
@@ -36,7 +36,7 @@ class MatrixCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.zero,
         onTap: onTap,
         child: content,
       ),

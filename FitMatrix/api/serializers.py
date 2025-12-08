@@ -260,11 +260,16 @@ class WishlistItemSerializer(serializers.ModelSerializer):
 
 
 class CollectionItemSerializer(serializers.ModelSerializer):
+    kind = serializers.SerializerMethodField()
     place = PlaceSummarySerializer(read_only=True)
+    created_at = serializers.DateTimeField(source="added_at", read_only=True)
 
     class Meta:
         model = CollectionItem
-        fields = ["id", "place", "added_at"]
+        fields = ["id", "kind", "place", "created_at"]
+
+    def get_kind(self, obj: CollectionItem) -> str:
+        return "place"
 
 
 class WishlistCollectionSerializer(serializers.ModelSerializer):
@@ -272,7 +277,8 @@ class WishlistCollectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WishlistCollection
-        fields = ["id", "name", "description", "created_at", "items"]
+        fields = ["id", "name", "description", "items"]
+        read_only_fields = ["id"]
 
 
 class PlaceReviewSerializer(serializers.ModelSerializer):
