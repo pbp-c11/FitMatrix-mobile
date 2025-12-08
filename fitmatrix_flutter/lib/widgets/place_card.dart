@@ -52,7 +52,7 @@ class PlaceCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// IMAGE (flexible)
+              /// IMAGE
               Expanded(
                 flex: 5,
                 child: ClipRRect(
@@ -60,13 +60,13 @@ class PlaceCard extends StatelessWidget {
                   child: (heroUrl == null || isSvg)
                       ? Container(color: MatrixColors.mint.withOpacity(0.4))
                       : CachedNetworkImage(
-                    imageUrl: heroUrl,
-                    fit: BoxFit.cover,
-                    placeholder: (_, __) =>
-                        Container(color: MatrixColors.mint.withOpacity(0.3)),
-                    errorWidget: (_, __, ___) =>
-                        Container(color: MatrixColors.mint.withOpacity(0.4)),
-                  ),
+                          imageUrl: heroUrl,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) =>
+                              Container(color: MatrixColors.mint.withOpacity(0.3)),
+                          errorWidget: (_, __, ___) =>
+                              Container(color: MatrixColors.mint.withOpacity(0.4)),
+                        ),
                 ),
               ),
 
@@ -76,22 +76,22 @@ class PlaceCard extends StatelessWidget {
               Text(
                 place.name,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: MatrixColors.ink,
-                  fontWeight: FontWeight.w800,
-                  fontSize: fontBase + 2,
-                ),
+                      color: MatrixColors.ink,
+                      fontWeight: FontWeight.w800,
+                      fontSize: fontBase + 2,
+                    ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
 
-              /// CITY & PRICE
+              /// CITY + PRICE
               const SizedBox(height: 4),
               Text(
                 '${place.city} | ${place.priceDisplay}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: MatrixColors.muted,
-                  fontSize: fontBase - 1,
-                ),
+                      color: MatrixColors.muted,
+                      fontSize: fontBase - 1,
+                    ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -113,11 +113,11 @@ class PlaceCard extends StatelessWidget {
 
               const SizedBox(height: 6),
 
-              /// BOTTOM ROW (never overflows)
+              /// BOTTOM ROW
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  /// ADAPTIVE CHIP
+                  /// CHIP
                   Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: chipPad,
@@ -137,7 +137,7 @@ class PlaceCard extends StatelessWidget {
                     ),
                   ),
 
-                  /// ADAPTIVE BUTTON
+                  /// BUTTON
                   Transform.scale(
                     scale: scale,
                     alignment: Alignment.centerRight,
