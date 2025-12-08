@@ -353,6 +353,24 @@ class WishlistCollectionViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
+    @action(detail=True, methods=["post"], url_path="delete")
+    def delete_collection(self, request, pk=None):
+        collection = self.get_object()
+        collection.delete()
+        return Response({"success": True})
+    
+    @action(detail=True, methods=['post'], url_path='items/(?P<item_id>[^/.]+)/delete')
+    def delete_item(self, request, pk=None, item_id=None):
+        collection = self.get_object()
+        item = collection.items.filter(id=item_id).first()
+
+        if not item:
+            return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        item.delete()
+        return Response({"success": True})
+
+
     @action(detail=True, methods=["post"], url_path="add")
     def add(self, request, pk=None):
         collection = self.get_object()
@@ -409,4 +427,3 @@ class PlaceReviewViewSet(viewsets.ModelViewSet):
         place = get_object_or_404(Place, slug=place_slug)
         serializer.context["place"] = place
         serializer.save()
-
