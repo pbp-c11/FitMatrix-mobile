@@ -17,7 +17,6 @@ class MatrixNavBar extends StatelessWidget {
       destinations: const [
         NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
         NavigationDestination(icon: Icon(Icons.place_outlined), label: 'Places'),
-        NavigationDestination(icon: Icon(Icons.fitness_center_outlined), label: 'Trainers'),
         NavigationDestination(icon: Icon(Icons.event_available_outlined), label: 'Sessions'),
         NavigationDestination(icon: Icon(Icons.favorite_outline), label: 'Wishlist'),
         NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
@@ -29,10 +28,9 @@ class MatrixNavBar extends StatelessWidget {
 
   int _indexForRoute(String route) {
     if (route.startsWith('/places')) return 1;
-    if (route.startsWith('/trainers')) return 2;
-    if (route.startsWith('/sessions')) return 3;
-    if (route.startsWith('/wishlist')) return 4;
-    if (route.startsWith('/profile') || route.startsWith('/bookings')) return 5;
+    if (route.startsWith('/sessions')) return 2;
+    if (route.startsWith('/wishlist')) return 3;
+    if (route.startsWith('/profile') || route.startsWith('/bookings')) return 4;
     return 0;
   }
 
@@ -45,15 +43,12 @@ class MatrixNavBar extends StatelessWidget {
         context.go('/places');
         break;
       case 2:
-        context.go('/trainers');
-        break;
-      case 3:
         context.go('/sessions');
         break;
-      case 4:
+      case 3:
         context.go('/wishlist');
         break;
-      case 5:
+      case 4:
         context.go('/profile');
         break;
     }
