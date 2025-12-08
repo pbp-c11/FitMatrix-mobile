@@ -34,7 +34,7 @@ def _load_secret_key() -> str:
 
 
 SECRET_KEY = _load_secret_key()
-DEBUG = os.getenv("DJANGO_DEBUG", "false").lower() == "false"
+DEBUG = os.getenv("DJANGO_DEBUG", "false").lower() == "true"
 
 ALLOWED_HOSTS = [
     "localhost",
