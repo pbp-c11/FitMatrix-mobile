@@ -51,65 +51,116 @@ class _HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(child: _HeroSection(summary: payload.summary)),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: _Section(
-              title: 'Trending Coordinates',
-              subtitle: 'High-scoring synergy picks',
-              child: SizedBox(
-                height: 340,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: payload.trending.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
-                  itemBuilder: (context, index) {
-                    final place = payload.trending[index];
-                    return SizedBox(
-                      width: 260,
-                      child: PlaceCard(
-                        place: place,
-                        onTap: () => context.go('/places/${place.slug}'),
-                        compact: true,
-                      ),
-                    );
-                  },
-                ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxWidth = constraints.maxWidth;
+        final bool isDesktop = maxWidth >= 1100;
+        final bool isTablet = maxWidth >= 700 && maxWidth < 1100;
+
+        int newestCrossAxisCount;
+        if (isDesktop) {
+          newestCrossAxisCount = 4;
+        } else if (isTablet) {
+          newestCrossAxisCount = 3;
+        } else {
+          newestCrossAxisCount = 2;
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.only(top: 14, bottom: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _HeroSection(summary: payload.summary),
+              const SizedBox(height: 16),
+              _TrendingSection(payload: payload),
+              const SizedBox(height: 16),
+              _NewestSection(
+                payload: payload,
+                crossAxisCount: newestCrossAxisCount,
               ),
-            ),
+            ],
           ),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.only(bottom: 20),
-          sliver: SliverToBoxAdapter(
-            child: _Section(
-              title: 'New in the FitMatrix',
-              subtitle: 'Freshly added venues',
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 12,
-                  crossAxisSpacing: 12,
-                  mainAxisExtent: 300,
-                ),
-                itemCount: payload.newest.length,
-                itemBuilder: (context, index) {
-                  final place = payload.newest[index];
-                  return PlaceCard(
+        );
+      },
+    );
+  }
+}
+
+class _TrendingSection extends StatelessWidget {
+  const _TrendingSection({required this.payload});
+  final HomePayload payload;
+
+  @override
+  Widget build(BuildContext context) {
+    if (payload.trending.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: _Section(
+        title: 'Trending Coordinates',
+        subtitle: 'High-scoring synergy picks',
+        child: SizedBox(
+          height: 340,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: payload.trending.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (context, index) {
+              final place = payload.trending[index];
+              return ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 220, maxWidth: 280),
+                child: SizedBox(
+                  width: 250,
+                  child: PlaceCard(
                     place: place,
                     onTap: () => context.go('/places/${place.slug}'),
-                  );
-                },
-              ),
-            ),
+                    compact: true,
+                  ),
+                ),
+              );
+            },
           ),
         ),
-      ],
+      ),
+    );
+  }
+}
+
+class _NewestSection extends StatelessWidget {
+  const _NewestSection({
+    required this.payload,
+    required this.crossAxisCount,
+  });
+
+  final HomePayload payload;
+  final int crossAxisCount;
+
+  @override
+  Widget build(BuildContext context) {
+    if (payload.newest.isEmpty) return const SizedBox.shrink();
+
+    return _Section(
+      title: 'New in the FitMatrix',
+      subtitle: 'Freshly added venues',
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: crossAxisCount >= 3 ? 0.9 : 0.75,
+        ),
+        itemCount: payload.newest.length,
+        itemBuilder: (context, index) {
+          final place = payload.newest[index];
+          return PlaceCard(
+            place: place,
+            onTap: () => context.go('/places/${place.slug}'),
+          );
+        },
+      ),
     );
   }
 }
@@ -211,21 +262,29 @@ class _Section extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-            ),
-            if (subtitle != null)
-              Text(
-                subtitle!,
+            Expanded(
+              child: Text(
+                title,
                 style: Theme.of(
                   context,
-                ).textTheme.bodySmall?.copyWith(color: MatrixColors.muted),
+                ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+              ),
+            ),
+            if (subtitle != null)
+              const SizedBox(width: 8),
+            if (subtitle != null)
+              Flexible(
+                child: Text(
+                  subtitle!,
+                  textAlign: TextAlign.right,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: MatrixColors.muted),
+                ),
               ),
           ],
         ),
