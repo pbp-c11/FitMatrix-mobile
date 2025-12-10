@@ -86,24 +86,22 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 14),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(user.displayName, style: Theme.of(context).textTheme.titleLarge),
-                    Text(user.email, style: Theme.of(context).textTheme.bodySmall),
-                    Chip(
-                      label: Text(user.isAdmin ? 'ADMIN' : 'USER'),
-                      backgroundColor: user.isAdmin ? MatrixColors.highlight : MatrixColors.mint,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Tap avatar to change photo',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: MatrixColors.muted,
-                          ),
-                    ),
-                  ],
-                ),
+                Expanded (
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(user.displayName, style: Theme.of(context).textTheme.titleLarge),
+                      Text(user.email, style: Theme.of(context).textTheme.bodySmall),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Tap avatar to change photo',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: MatrixColors.muted,
+                            ),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
           ),

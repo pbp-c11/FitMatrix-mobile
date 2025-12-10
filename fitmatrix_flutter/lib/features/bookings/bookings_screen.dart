@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart'; 
 
 import '../../core/theme.dart';
 import '../../data/api_service.dart';
@@ -26,25 +27,46 @@ class BookingsScreen extends ConsumerWidget {
           final upcoming = items.where((b) => b.isUpcoming).toList();
           final past = items.where((b) => !b.isUpcoming).toList();
           return ListView(
-            children: [
-              const SizedBox(height: 12),
-              Text(
-                'My bookings',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 12),
-              _BookingSection(
-                title: 'Upcoming sessions',
-                bookings: upcoming,
-                onCancel: (id) async {
-                  await ref.read(apiServiceProvider).cancelBooking(id);
-                  ref.invalidate(bookingsProvider);
-                },
-              ),
-              const SizedBox(height: 16),
-              _BookingSection(title: 'Past sessions', bookings: past),
-            ],
-          );
+  children: [
+    const SizedBox(height: 12),
+
+    Row(
+      children: [
+        IconButton(
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          color: MatrixColors.ink,
+          onPressed: () => context.go('/profile'),
+        ),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            'My bookings',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context)
+                .textTheme
+                .headlineSmall
+                ?.copyWith(fontWeight: FontWeight.w800),
+          ),
+        ),
+      ],
+    ),
+
+    const SizedBox(height: 12),
+    _BookingSection(
+      title: 'Upcoming sessions',
+      bookings: upcoming,
+      onCancel: (id) async {
+        await ref.read(apiServiceProvider).cancelBooking(id);
+        ref.invalidate(bookingsProvider);
+      },
+    ),
+    const SizedBox(height: 16),
+    _BookingSection(title: 'Past sessions', bookings: past),
+  ],
+);
         },
       ),
     );

@@ -91,12 +91,29 @@ class _CollectionDetailScreenState
           right: 16,
         ),
         children: [
-          Text(
-            collection.name,
-            style: Theme.of(context)
-                .textTheme
-                .headlineSmall
-                ?.copyWith(fontWeight: FontWeight.w800),
+          Row(
+            children: [
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+                color: MatrixColors.ink, // atau sesuai theme kamu
+                onPressed: () => context.go('/wishlist'),
+              ),
+              const SizedBox(width: 4),
+
+              Expanded(
+                child: Text(
+                  collection.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(fontWeight: FontWeight.w800),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 4),
           if (collection.description != null &&
