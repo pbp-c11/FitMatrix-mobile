@@ -26,7 +26,8 @@ class PlaceCard extends StatelessWidget {
     final heroUrl = _resolveImage(
       place.heroImage ?? (place.gallery.isNotEmpty ? place.gallery.first : null),
     );
-    final isSvg = heroUrl != null && heroUrl.toLowerCase().endsWith('.svg');
+
+    final bool isSvg = heroUrl != null && heroUrl.toLowerCase().endsWith('.svg');
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -52,27 +53,32 @@ class PlaceCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// IMAGE
-              Expanded(
-                flex: 5,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
+              // =========================
+              // IMAGE SECTION
+              // =========================
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: AspectRatio(
+                  aspectRatio: 16 / 9,
                   child: (heroUrl == null || isSvg)
-                      ? Container(color: MatrixColors.mint.withOpacity(0.4))
-                      : CachedNetworkImage(
-                          imageUrl: heroUrl,
+                      ? Container(
+                          color: MatrixColors.mint.withOpacity(0.3),
+                          child: const Icon(Icons.broken_image, size: 50, color: Colors.red),
+                        )
+                      : Image.network(
+                          'http://127.0.0.1:8000/proxy-image/?url=${Uri.encodeComponent(heroUrl)}',
                           fit: BoxFit.cover,
-                          placeholder: (_, __) =>
-                              Container(color: MatrixColors.mint.withOpacity(0.3)),
-                          errorWidget: (_, __, ___) =>
-                              Container(color: MatrixColors.mint.withOpacity(0.4)),
+                          errorBuilder: (_, __, ___) =>
+                              const Center(child: Icon(Icons.broken_image, size: 50, color: Colors.red)),
                         ),
                 ),
               ),
 
               const SizedBox(height: 8),
 
-              /// NAME
+              // =========================
+              // NAME
+              // =========================
               Text(
                 place.name,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -84,8 +90,11 @@ class PlaceCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
 
-              /// CITY + PRICE
               const SizedBox(height: 4),
+
+              // =========================
+              // CITY + PRICE
+              // =========================
               Text(
                 '${place.city} | ${place.priceDisplay}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -96,28 +105,30 @@ class PlaceCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
 
-              /// SUMMARY
               const SizedBox(height: 6),
+
+              // =========================
+              // SUMMARY
+              // =========================
               if (!compact)
                 Text(
-                  place.summary ??
-                      place.tagline ??
-                      'Premium multi-zone facility.',
+                  place.summary ?? place.tagline ?? 'Premium multi-zone facility.',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(fontSize: fontBase - 2),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontSize: fontBase - 2,
+                      ),
                 ),
 
               const SizedBox(height: 6),
 
-              /// BOTTOM ROW
+              // =========================
+              // BOTTOM ROW
+              // =========================
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  /// CHIP
+                  // CHIP
                   Container(
                     padding: EdgeInsets.symmetric(
                       horizontal: chipPad,
@@ -137,7 +148,7 @@ class PlaceCard extends StatelessWidget {
                     ),
                   ),
 
-                  /// BUTTON
+                  // BUTTON
                   Transform.scale(
                     scale: scale,
                     alignment: Alignment.centerRight,
@@ -158,11 +169,19 @@ class PlaceCard extends StatelessWidget {
   }
 
   String? _resolveImage(String? url) {
+    const String serverIp = 'http://127.0.0.1:8000';
+
     if (url == null || url.isEmpty) return null;
+
     if (url.startsWith('http')) return url;
-    if (url.startsWith('/')) return '${AppConfig.mediaBaseUrl}$url';
-    if (url.startsWith('media/')) return '${AppConfig.mediaBaseUrl}/$url';
-    if (url.startsWith('static/')) return '${AppConfig.mediaBaseUrl}/$url';
-    return '${AppConfig.mediaBaseUrl}/static/$url';
+
+    if (url.startsWith('/')) return '$serverIp$url';
+
+    if (url.startsWith('media/') || url.startsWith('static/')) {
+      return '$serverIp/$url';
+    }
+
+    return '$serverIp/static/$url';
   }
 }
+

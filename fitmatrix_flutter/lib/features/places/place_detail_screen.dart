@@ -23,10 +23,6 @@ final placeReviewsProvider = FutureProvider.family<List<Review>, String>((ref, s
   return ref.read(apiServiceProvider).fetchPlaceReviews(slug);
 });
 
-// final placesProvider = FutureProvider<List<Place>>((ref) {
-//   return ref.read(apiServiceProvider).fetchPlaces();
-// });
-
 
 class PlaceDetailScreen extends ConsumerWidget {
   const PlaceDetailScreen({super.key, required this.slug});
@@ -157,7 +153,7 @@ class _CreateCollectionDialogState
         },
         child: const Text("Create"),
       ),
-          
+
       ],
     );
   }
@@ -187,11 +183,14 @@ class _PlaceDetailBody extends ConsumerWidget {
                 if (heroUrl != null && !isSvg)
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
-                    child: CachedNetworkImage(
-                      imageUrl: heroUrl,
-                      width: double.infinity,
-                      height: 220,
-                      fit: BoxFit.cover,
+                    child: AspectRatio(
+                      aspectRatio: 16 / 9, // BIAR GAK GEPEng
+                      child: Image.network(
+                        'http://127.0.0.1:8000/proxy-image/?url=${Uri.encodeComponent(heroUrl)}',
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            const Center(child: Icon(Icons.broken_image, size: 60, color: Colors.red)),
+                      ),
                     ),
                   ),
                 if (heroUrl == null || isSvg)
@@ -260,38 +259,25 @@ class _PlaceDetailBody extends ConsumerWidget {
                       Row(
                         children: [
                           Expanded(
-                            child: SizedBox(
-                              height: 44,
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: MatrixButton(
-                                  label: 'Add to wishlist',
-                                  variant: MatrixButtonVariant.ghost,
-                                  onPressed: auth.state.isAuthenticated
-                                      ? () => _openCollectionSheet(context, ref)
-                                      : () => ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(content: Text('Login to save this place')),
-                                          ),
-                                ),
-                              ),
+                            child: MatrixButton(
+                              label: 'Add to wishlist',
+                              variant: MatrixButtonVariant.ghost,
+                              onPressed: auth.state.isAuthenticated
+                                  ? () => _openCollectionSheet(context, ref)
+                                  : () => ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Login to save this place')),
+                                      ),
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           Expanded(
-                            child: SizedBox(
-                              height: 44,
-                              child: FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: MatrixButton(
-                                  label: 'Book session',
-                                  onPressed: () => _bookFromPlace(context),
-                                ),
-                              ),
+                            child: MatrixButton(
+                              label: 'Book session',
+                              onPressed: () => _bookFromPlace(context),
                             ),
                           ),
                         ],
-                      )
-
+                      ),
                     ],
                   ),
                 ),
@@ -346,12 +332,27 @@ class _PlaceDetailBody extends ConsumerWidget {
   }
 
   String? _resolveImage(String? url) {
+    const String serverIp = 'http://127.0.0.1:8000';
+
     if (url == null || url.isEmpty) return null;
-    if (url.startsWith('http')) return url;
-    if (url.startsWith('/')) return '${AppConfig.mediaBaseUrl}$url';
-    if (url.startsWith('media/')) return '${AppConfig.mediaBaseUrl}/$url';
-    if (url.startsWith('static/')) return '${AppConfig.mediaBaseUrl}/$url';
-    return '${AppConfig.mediaBaseUrl}/static/$url';
+    if (url.startsWith('http')) {
+      if (url.contains(serverIp)) {
+        return url;
+      }
+      final encodedUrl = Uri.encodeComponent(url);
+      return url;
+      // return '$serverIp/places/proxy-image/?url=$encodedUrl';
+    }
+
+
+    if (url.startsWith('/')) {
+      return '$serverIp$url';
+    }
+
+    if (url.startsWith('media/') || url.startsWith('static/')) {
+      return '$serverIp/$url';
+    }
+    return '$serverIp/static/$url';
   }
 
   Future<void> _toggleWishlist(BuildContext context, WidgetRef ref) async {
@@ -382,12 +383,10 @@ class _PlaceDetailBody extends ConsumerWidget {
   );
 }
 
-
   void _openMaps(String url) async {
     final uri = Uri.parse(url);
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
-
 }
 
 class _PlaceReviews extends ConsumerStatefulWidget {
@@ -480,7 +479,6 @@ class _PlaceReviewsState extends ConsumerState<_PlaceReviews> {
     await api.submitPlaceReview(widget.slug, _rating, _body.text.trim());
     ref.invalidate(placeReviewsProvider(widget.slug));
     ref.invalidate(placeDetailProvider(widget.slug));
-    // ref.invalidate(placesProvider);
 
     _body.clear();
     if (mounted) {
