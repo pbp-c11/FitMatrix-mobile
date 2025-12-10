@@ -99,7 +99,6 @@ class _TrendingSection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: _Section(
         title: 'Trending Coordinates',
-        subtitle: 'High-scoring synergy picks',
         child: SizedBox(
           height: 340,
           child: ListView.separated(
@@ -142,7 +141,6 @@ class _NewestSection extends StatelessWidget {
 
     return _Section(
       title: 'New in the FitMatrix',
-      subtitle: 'Freshly added venues',
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),

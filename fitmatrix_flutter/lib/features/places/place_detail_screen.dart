@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/config.dart';
 import '../../core/theme.dart';
@@ -258,22 +259,39 @@ class _PlaceDetailBody extends ConsumerWidget {
                       const SizedBox(height: 16),
                       Row(
                         children: [
-                          MatrixButton(
-                            label: 'Add to wishlist',
-                            variant: MatrixButtonVariant.ghost,
-                            onPressed: auth.state.isAuthenticated
-                                ? () => _openCollectionSheet(context, ref)
-                                : () => ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Login to save this place')),
-                                    ),
+                          Expanded(
+                            child: SizedBox(
+                              height: 44,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: MatrixButton(
+                                  label: 'Add to wishlist',
+                                  variant: MatrixButtonVariant.ghost,
+                                  onPressed: auth.state.isAuthenticated
+                                      ? () => _openCollectionSheet(context, ref)
+                                      : () => ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(content: Text('Login to save this place')),
+                                          ),
+                                ),
+                              ),
+                            ),
                           ),
                           const SizedBox(width: 10),
-                          MatrixButton(
-                            label: 'Book session',
-                            onPressed: () => _bookFromPlace(context),
+                          Expanded(
+                            child: SizedBox(
+                              height: 44,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: MatrixButton(
+                                  label: 'Book session',
+                                  onPressed: () => _bookFromPlace(context),
+                                ),
+                              ),
+                            ),
                           ),
                         ],
-                      ),
+                      )
+
                     ],
                   ),
                 ),
@@ -285,10 +303,31 @@ class _PlaceDetailBody extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Location', style: Theme.of(context).textTheme.titleLarge),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Location',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 6),
-                Text(place.address ?? '', style: Theme.of(context).textTheme.bodyMedium),
-                Text(place.city, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: MatrixColors.muted)),
+                Text(
+                  place.address ?? '',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                Text(
+                  place.city,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: MatrixColors.muted,
+                      ),
+                ),
                 const SizedBox(height: 10),
                 if (place.googleMapsUrl != null)
                   MatrixButton(
@@ -344,9 +383,11 @@ class _PlaceDetailBody extends ConsumerWidget {
 }
 
 
-  void _openMaps(String url) {
-    // Placeholder for url_launcher; keep as info for now.
+  void _openMaps(String url) async {
+    final uri = Uri.parse(url);
+    await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
+
 }
 
 class _PlaceReviews extends ConsumerStatefulWidget {
