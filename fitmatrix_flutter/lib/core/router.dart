@@ -114,7 +114,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/wishlist/collection/:id',
             name:'collection-detail',
             builder: (context, state){
-              final collection = state.extra as WishlistCollection;
+              final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+              final collection = state.extra as WishlistCollection?;
+
+              if (collection == null) {
+                // sementara: balikin ke wishlist atau tampilkan screen yang fetch by id
+                return const WishlistScreen(); // atau ErrorScreen sederhana
+              }
+
               return CollectionDetailScreen(collection: collection);
             },
           ),
