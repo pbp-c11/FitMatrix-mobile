@@ -17,6 +17,24 @@ import '../../widgets/matrix_scaffold.dart';
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
+  Future<void> _changeAvatar(BuildContext context, WidgetRef ref) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    if (picked == null) return;
+
+    try {
+      final avatar = await MultipartFile.fromFile(
+        picked.path,
+        filename: picked.name,
+      );
+      await ref.read(authControllerProvider).updateProfile(avatar: avatar);
+      messenger.showSnackBar(const SnackBar(content: Text('Profile picture updated')));
+    } catch (_) {
+      messenger.showSnackBar(const SnackBar(content: Text('Failed to update profile picture')));
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authControllerProvider);
@@ -39,6 +57,10 @@ class ProfileScreen extends ConsumerWidget {
         ),
       );
     }
+
+    final avatarInitial = user.displayName.isNotEmpty
+        ? user.displayName[0].toUpperCase()
+        : user.username[0].toUpperCase();
 
     return MatrixScaffold(
       body: ListView(

@@ -7,7 +7,8 @@ import 'models/place.dart';
 import 'models/review.dart';
 import 'models/session_slot.dart';
 import 'models/trainer.dart';
-import 'models/wishlist.dart';
+import 'models/wishlist_item.dart';
+import 'models/wishlist_collection.dart';
 import 'secured_client.dart';
 
 class ApiService {
@@ -133,11 +134,6 @@ class ApiService {
 
   Future<void> submitPlaceReview(String slug, int rating, String body) async {
     await _dio.post('place-reviews/', data: {'place': slug, 'rating': rating, 'body': body});
-  }
-
-  Future<List<Review>> fetchTrainerReviews(int trainerId) async {
-    final res = await _dio.get('trainer-reviews/', queryParameters: {'trainer': trainerId});
-    return _asList(res.data).map((e) => Review.fromJson(e as Map<String, dynamic>)).toList();
   }
 
   List<dynamic> _asList(dynamic data) {

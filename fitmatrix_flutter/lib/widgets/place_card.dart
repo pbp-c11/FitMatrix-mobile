@@ -24,8 +24,7 @@ class PlaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final heroUrl = _resolveImage(
-      place.heroImage ??
-          (place.gallery.isNotEmpty ? place.gallery.first : null),
+      place.heroImage ?? (place.gallery.isNotEmpty ? place.gallery.first : null),
     );
     final isSvg = heroUrl != null && heroUrl.toLowerCase().endsWith('.svg');
 
@@ -102,19 +101,19 @@ class PlaceCard extends StatelessWidget {
   }
 
   String? _resolveImage(String? url) {
+    const String serverIp = 'http://127.0.0.1:8000';
+
     if (url == null || url.isEmpty) return null;
+
     if (url.startsWith('http')) return url;
-    if (url.startsWith('/')) {
-      return '${AppConfig.mediaBaseUrl}$url';
+
+    if (url.startsWith('/')) return '$serverIp$url';
+
+    if (url.startsWith('media/') || url.startsWith('static/')) {
+      return '$serverIp/$url';
     }
-    // Support both static/ and media/ paths coming from Django
-    if (url.startsWith('media/')) {
-      return '${AppConfig.mediaBaseUrl}/$url';
-    }
-    if (url.startsWith('static/')) {
-      return '${AppConfig.mediaBaseUrl}/$url';
-    }
-    return '${AppConfig.mediaBaseUrl}/static/$url';
+
+    return '$serverIp/static/$url';
   }
 }
 

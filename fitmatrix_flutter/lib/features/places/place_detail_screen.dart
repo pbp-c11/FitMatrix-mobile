@@ -189,11 +189,14 @@ class _PlaceDetailBody extends ConsumerWidget {
                 if (heroUrl != null && !isSvg)
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
-                    child: CachedNetworkImage(
-                      imageUrl: heroUrl,
-                      width: double.infinity,
-                      height: 220,
-                      fit: BoxFit.cover,
+                    child: AspectRatio(
+                      aspectRatio: 16 / 9, // BIAR GAK GEPEng
+                      child: Image.network(
+                        'http://127.0.0.1:8000/proxy-image/?url=${Uri.encodeComponent(heroUrl)}',
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            const Center(child: Icon(Icons.broken_image, size: 60, color: Colors.red)),
+                      ),
                     ),
                   ),
                 if (heroUrl == null || isSvg)
@@ -215,9 +218,34 @@ class _PlaceDetailBody extends ConsumerWidget {
                         backgroundColor: MatrixColors.mint.withOpacity(0.4),
                       ),
                       const SizedBox(height: 8),
-                      Text(
-                        place.name,
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              place.name,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 6,
+                            children: [
+                              Chip(
+                                label: Text(
+                                  'Rating ${place.ratingAvg.toStringAsFixed(1)}',
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              ),
+                            ],
+                          )
+                        ],
                       ),
                       const SizedBox(height: 6),
                       Text(
@@ -263,10 +291,31 @@ class _PlaceDetailBody extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Location', style: Theme.of(context).textTheme.titleLarge),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Location',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 6),
-                Text(place.address ?? '', style: Theme.of(context).textTheme.bodyMedium),
-                Text(place.city, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: MatrixColors.muted)),
+                Text(
+                  place.address ?? '',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                Text(
+                  place.city,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: MatrixColors.muted,
+                      ),
+                ),
                 const SizedBox(height: 10),
                 if (place.googleMapsUrl != null)
                   MatrixButton(
@@ -326,12 +375,27 @@ class _PlaceDetailBody extends ConsumerWidget {
   }
 
   String? _resolveImage(String? url) {
+    const String serverIp = 'http://127.0.0.1:8000';
+
     if (url == null || url.isEmpty) return null;
-    if (url.startsWith('http')) return url;
-    if (url.startsWith('/')) return '${AppConfig.mediaBaseUrl}$url';
-    if (url.startsWith('media/')) return '${AppConfig.mediaBaseUrl}/$url';
-    if (url.startsWith('static/')) return '${AppConfig.mediaBaseUrl}/$url';
-    return '${AppConfig.mediaBaseUrl}/static/$url';
+    if (url.startsWith('http')) {
+      if (url.contains(serverIp)) {
+        return url;
+      }
+      final encodedUrl = Uri.encodeComponent(url);
+      return url;
+      // return '$serverIp/places/proxy-image/?url=$encodedUrl';
+    }
+
+
+    if (url.startsWith('/')) {
+      return '$serverIp$url';
+    }
+
+    if (url.startsWith('media/') || url.startsWith('static/')) {
+      return '$serverIp/$url';
+    }
+    return '$serverIp/static/$url';
   }
 
   void _bookFromPlace(BuildContext context, WidgetRef ref) {
@@ -600,6 +664,8 @@ class _PlaceReviewsState extends ConsumerState<_PlaceReviews> {
     final api = ref.read(apiServiceProvider);
     await api.submitPlaceReview(widget.slug, _rating, _body.text.trim());
     ref.invalidate(placeReviewsProvider(widget.slug));
+    ref.invalidate(placeDetailProvider(widget.slug));
+
     _body.clear();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

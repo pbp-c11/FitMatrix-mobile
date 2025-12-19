@@ -231,6 +231,49 @@ class AuthController extends ChangeNotifier {
     return User.fromJson(res.data as Map<String, dynamic>);
   }
 
+  Future<User?> updateProfile({
+    String? displayName,
+    String? email,
+    MultipartFile? avatar,
+  }) async {
+    if (_state.accessToken == null) return null;
+    _state = _state.copyWith(loading: true, clearError: true);
+    notifyListeners();
+
+    final data = <String, dynamic>{};
+    if (displayName != null) data['display_name'] = displayName;
+    if (email != null) data['email'] = email;
+    if (avatar != null) data['avatar'] = avatar;
+
+    try {
+      final res = await _dio.patch(
+        '${AppConfig.apiBaseUrl}auth/me/',
+        data: FormData.fromMap(data),
+        options: Options(
+          headers: {'Authorization': 'Bearer ${_state.accessToken}'},
+        ),
+      );
+      final user = User.fromJson(res.data as Map<String, dynamic>);
+      _state = _state.copyWith(user: user, loading: false, clearError: true);
+      notifyListeners();
+      return user;
+    } on DioException catch (err) {
+      _state = _state.copyWith(
+        loading: false,
+        error: _extractError(err, 'Unable to update profile'),
+      );
+      notifyListeners();
+      return null;
+    } catch (_) {
+      _state = _state.copyWith(
+        loading: false,
+        error: 'Unable to update profile',
+      );
+      notifyListeners();
+      return null;
+    }
+  }
+
   Future<void> _persistTokens(String access, String refresh) async {
     await _prefs.setString(_kAccess, access);
     await _prefs.setString(_kRefresh, refresh);

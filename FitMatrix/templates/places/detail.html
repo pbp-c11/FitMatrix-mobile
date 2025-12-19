@@ -136,7 +136,7 @@
     {% if request.user.is_authenticated %}
     <form id="reviewForm"
           method="post"
-          action="{% url 'places:place_review_create' slug=place.slug %}"
+          action="{% url 'reviews:place_review_create' slug=place.slug %}"
           class="mt-8 bg-white/70 border border-[#C9FFD4] rounded-2xl p-5 shadow-sm">
       {% csrf_token %}
       <h3 class="text-lg font-semibold text-[#12391E] mb-3">Leave a Review</h3>

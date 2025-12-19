@@ -66,7 +66,7 @@ class _HomeContent extends StatelessWidget {
                     ? payload.trending
                     : payload.spotlights,
               ),
-            ),
+            ],
           ),
         ),
         SliverPadding(
@@ -98,7 +98,44 @@ class _HomeContent extends StatelessWidget {
             ),
           ),
         ),
-      ],
+      ),
+    );
+  }
+}
+
+class _NewestSection extends StatelessWidget {
+  const _NewestSection({
+    required this.payload,
+    required this.crossAxisCount,
+  });
+
+  final HomePayload payload;
+  final int crossAxisCount;
+
+  @override
+  Widget build(BuildContext context) {
+    if (payload.newest.isEmpty) return const SizedBox.shrink();
+
+    return _Section(
+      title: 'New in the FitMatrix',
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: crossAxisCount,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: crossAxisCount >= 3 ? 0.9 : 0.75,
+        ),
+        itemCount: payload.newest.length,
+        itemBuilder: (context, index) {
+          final place = payload.newest[index];
+          return PlaceCard(
+            place: place,
+            onTap: () => context.go('/places/${place.slug}'),
+          );
+        },
+      ),
     );
   }
 }
@@ -209,7 +246,7 @@ class _HeroSection extends StatelessWidget {
               MatrixButton(
                 label: 'Browse trainers',
                 variant: MatrixButtonVariant.ghost,
-                onPressed: () => context.go('/trainers'),
+                onPressed: () => context.go('/sessions'),
               ),
             ],
           ),
@@ -257,21 +294,29 @@ class _Section extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
-            ),
-            if (subtitle != null)
-              Text(
-                subtitle!,
+            Expanded(
+              child: Text(
+                title,
                 style: Theme.of(
                   context,
-                ).textTheme.bodySmall?.copyWith(color: MatrixColors.muted),
+                ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+              ),
+            ),
+            if (subtitle != null)
+              const SizedBox(width: 8),
+            if (subtitle != null)
+              Flexible(
+                child: Text(
+                  subtitle!,
+                  textAlign: TextAlign.right,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: MatrixColors.muted),
+                ),
               ),
           ],
         ),
