@@ -1,37 +1,43 @@
-# Root gitignore for MarvelMatrix mono-repo
+# Codex / AI assistant artifacts
+.codex/
+.codex-cli/
+.openai/
+*.codex.log
 
-# OS
-.DS_Store
-Thumbs.db
-desktop.ini
+# Python virtual environments
+venv/
+.venv/
 
-# IDE / Editors
-.idea/
-.vscode/
-*.iml
-
-# Python / Django (FitMatrix)
+# Django / Python caches
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
-*.sqlite3
-db.sqlite3
-*.log
-venv/
-.venv/
+.pytest_cache/
+.coverage
+coverage.xml
 
-# Django static/media build artifacts
-FitMatrix/staticfiles/
-FitMatrix/media/
-
-# Flutter / Android (fitmatrix_flutter)
-fitmatrix_flutter/.dart_tool/
-fitmatrix_flutter/.flutter-plugins
-fitmatrix_flutter/.flutter-plugins-dependencies
-fitmatrix_flutter/.packages
-fitmatrix_flutter/build/
-
-# Node / web (if any)
+# Node / tooling
 node_modules/
+
+# IDE / editor
+.idea/
+.vscode/
+*.iml
+
+# OS junk
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Flutter / Android / iOS build output
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/pubspec.lock
+
+# Ignore Dhea mobile + backend tree (only commit Kalfin version)
+FitMAtrix-mobile-dhea/
 

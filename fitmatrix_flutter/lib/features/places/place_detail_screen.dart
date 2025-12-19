@@ -9,10 +9,12 @@ import '../../data/api_service.dart';
 import '../../data/auth_controller.dart';
 import '../../data/models/place.dart';
 import '../../data/models/review.dart';
+import '../../data/models/session_slot.dart';
+import '../../data/providers/collections_provider.dart';
 import '../../widgets/matrix_button.dart';
 import '../../widgets/matrix_card.dart';
 import '../../widgets/matrix_scaffold.dart';
-import '../../data/providers/collections_provider.dart';
+import '../bookings/bookings_screen.dart' show bookingsProvider;
 
 
 final placeDetailProvider = FutureProvider.family<Place, String>((ref, slug) {
@@ -23,6 +25,9 @@ final placeReviewsProvider = FutureProvider.family<List<Review>, String>((ref, s
   return ref.read(apiServiceProvider).fetchPlaceReviews(slug);
 });
 
+final placeSessionsProvider = FutureProvider.family<List<SessionSlot>, String>((ref, slug) {
+  return ref.read(apiServiceProvider).fetchSessions(placeSlug: slug);
+});
 
 class PlaceDetailScreen extends ConsumerWidget {
   const PlaceDetailScreen({super.key, required this.slug});
@@ -153,7 +158,7 @@ class _CreateCollectionDialogState
         },
         child: const Text("Create"),
       ),
-
+          
       ],
     );
   }
@@ -169,6 +174,7 @@ class _PlaceDetailBody extends ConsumerWidget {
     final heroUrl = _resolveImage(place.heroImage ?? (place.gallery.isNotEmpty ? place.gallery.first : null));
     final isSvg = heroUrl != null && heroUrl.toLowerCase().endsWith('.svg');
     final auth = ref.watch(authControllerProvider);
+    final sessions = ref.watch(placeSessionsProvider(place.slug));
 
     return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: 40),
@@ -258,23 +264,19 @@ class _PlaceDetailBody extends ConsumerWidget {
                       const SizedBox(height: 16),
                       Row(
                         children: [
-                          Expanded(
-                            child: MatrixButton(
-                              label: 'Add to wishlist',
-                              variant: MatrixButtonVariant.ghost,
-                              onPressed: auth.state.isAuthenticated
-                                  ? () => _openCollectionSheet(context, ref)
-                                  : () => ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Login to save this place')),
-                                      ),
-                            ),
+                          MatrixButton(
+                            label: 'Add to wishlist',
+                            variant: MatrixButtonVariant.ghost,
+                            onPressed: auth.state.isAuthenticated
+                                ? () => _openCollectionSheet(context, ref)
+                                : () => ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Login to save this place')),
+                                    ),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: MatrixButton(
-                              label: 'Book session',
-                              onPressed: () => _bookFromPlace(context),
-                            ),
+                          const SizedBox(width: 10),
+                          MatrixButton(
+                            label: 'Book session',
+                            onPressed: () => _bookFromPlace(context, ref),
                           ),
                         ],
                       ),
@@ -319,8 +321,49 @@ class _PlaceDetailBody extends ConsumerWidget {
                   MatrixButton(
                     label: 'Open in Maps',
                     variant: MatrixButtonVariant.ghost,
-                    onPressed: () => _openMaps(place.googleMapsUrl!),
+                    onPressed: () => _openMaps(context, place.googleMapsUrl!),
                   ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          MatrixCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Upcoming sessions', style: Theme.of(context).textTheme.titleLarge),
+                    TextButton(
+                      onPressed: () => _bookFromPlace(context, ref),
+                      child: const Text('View all'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                sessions.when(
+                  loading: () => const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    child: LinearProgressIndicator(minHeight: 3),
+                  ),
+                  error: (err, _) => Text('Unable to load sessions: $err'),
+                  data: (slots) {
+                    if (slots.isEmpty) {
+                      return const Text('No sessions scheduled at this location yet.');
+                    }
+                    return Column(
+                      children: slots.take(3).map(
+                        (slot) {
+                          return _SessionRow(
+                            slot: slot,
+                            onBook: () => _bookSlot(context, ref, slot),
+                          );
+                        },
+                      ).toList(),
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -355,19 +398,74 @@ class _PlaceDetailBody extends ConsumerWidget {
     return '$serverIp/static/$url';
   }
 
-  Future<void> _toggleWishlist(BuildContext context, WidgetRef ref) async {
-    final api = ref.read(apiServiceProvider);
-    final status = await api.toggleWishlist('place', place.id);
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(status == 'added' ? 'Saved to wishlist' : 'Removed from wishlist')),
-      );
-    }
-  }
-
-  void _bookFromPlace(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Pick a trainer slot from Sessions to book this venue.')),
+  void _bookFromPlace(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      ),
+      builder: (modalContext) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 18,
+            right: 18,
+            top: 12,
+            bottom: MediaQuery.of(modalContext).viewInsets.bottom + 24,
+          ),
+          child: Consumer(
+            builder: (context, modalRef, _) {
+              final sessions = modalRef.watch(placeSessionsProvider(place.slug));
+              return SizedBox(
+                height: 420,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 48,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: MatrixColors.border,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Sessions at ${place.name}',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 12),
+                    Expanded(
+                      child: sessions.when(
+                        loading: () => const Center(child: CircularProgressIndicator()),
+                        error: (err, _) => Center(child: Text('Unable to load sessions: $err')),
+                        data: (slots) {
+                          if (slots.isEmpty) {
+                            return const Center(child: Text('No active sessions scheduled here yet.'));
+                          }
+                          return ListView.separated(
+                            itemCount: slots.length,
+                            separatorBuilder: (_, __) => const SizedBox(height: 10),
+                            itemBuilder: (context, index) {
+                              final slot = slots[index];
+                              return _SessionRow(
+                                slot: slot,
+                                onBook: () => _bookSlot(context, modalRef, slot),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -383,9 +481,97 @@ class _PlaceDetailBody extends ConsumerWidget {
   );
 }
 
-  void _openMaps(String url) async {
-    final uri = Uri.parse(url);
-    await launchUrl(uri, mode: LaunchMode.externalApplication);
+
+  Future<void> _openMaps(BuildContext context, String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.platformDefault);
+      if (!launched && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unable to open map link.')),
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unable to open map link.')),
+        );
+      }
+    }
+  }
+
+  Future<void> _bookSlot(BuildContext context, WidgetRef ref, SessionSlot slot) async {
+    final auth = ref.read(authControllerProvider);
+    if (!auth.state.isAuthenticated) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login to book this session.')),
+      );
+      return;
+    }
+    try {
+      await ref.read(apiServiceProvider).bookSlot(slot.id);
+      ref.invalidate(bookingsProvider);
+      ref.invalidate(placeSessionsProvider(place.slug));
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Session booked.')),
+        );
+      }
+    } catch (err) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Unable to book: $err')),
+        );
+      }
+    }
+  }
+}
+
+class _SessionRow extends StatelessWidget {
+  const _SessionRow({required this.slot, required this.onBook});
+
+  final SessionSlot slot;
+  final VoidCallback onBook;
+
+  @override
+  Widget build(BuildContext context) {
+    final start = slot.start.toLocal();
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  slot.trainer?.name ?? 'Trainer assignment pending',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${slot.place?.name ?? ''} • ${start.toString().substring(0, 16)}',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: MatrixColors.muted),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  '${slot.seatsLeft} seats left',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: MatrixColors.muted),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          MatrixButton(
+            label: slot.seatsLeft > 0 ? 'Book' : 'Full',
+            variant: MatrixButtonVariant.ghost,
+            onPressed: slot.seatsLeft > 0 ? onBook : null,
+          ),
+        ],
+      ),
+    );
   }
 }
 

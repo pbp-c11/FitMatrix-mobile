@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme.dart';
 import '../../data/api_service.dart';
 import '../../data/models/home_payload.dart';
+import '../../data/models/place.dart';
 import '../../widgets/matrix_button.dart';
 import '../../widgets/matrix_card.dart';
 import '../../widgets/matrix_scaffold.dart';
@@ -51,74 +52,50 @@ class _HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final maxWidth = constraints.maxWidth;
-        final bool isDesktop = maxWidth >= 1100;
-        final bool isTablet = maxWidth >= 700 && maxWidth < 1100;
-
-        int newestCrossAxisCount;
-        if (isDesktop) {
-          newestCrossAxisCount = 4;
-        } else if (isTablet) {
-          newestCrossAxisCount = 3;
-        } else {
-          newestCrossAxisCount = 2;
-        }
-
-        return SingleChildScrollView(
-          padding: const EdgeInsets.only(top: 14, bottom: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _HeroSection(summary: payload.summary),
-              const SizedBox(height: 16),
-              _TrendingSection(payload: payload),
-              const SizedBox(height: 16),
-              _NewestSection(
-                payload: payload,
-                crossAxisCount: newestCrossAxisCount,
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(child: _HeroSection(summary: payload.summary)),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: _Section(
+              title: 'Trending Coordinates',
+              subtitle: 'High-scoring synergy picks',
+              child: _TrendingList(
+                places: payload.trending.isNotEmpty
+                    ? payload.trending
+                    : payload.spotlights,
               ),
             ],
           ),
-        );
-      },
-    );
-  }
-}
-
-class _TrendingSection extends StatelessWidget {
-  const _TrendingSection({required this.payload});
-  final HomePayload payload;
-
-  @override
-  Widget build(BuildContext context) {
-    if (payload.trending.isEmpty) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: _Section(
-        title: 'Trending Coordinates',
-        child: SizedBox(
-          height: 340,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: payload.trending.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, index) {
-              final place = payload.trending[index];
-              return ConstrainedBox(
-                constraints: const BoxConstraints(minWidth: 220, maxWidth: 280),
-                child: SizedBox(
-                  width: 250,
-                  child: PlaceCard(
-                    place: place,
-                    onTap: () => context.go('/places/${place.slug}'),
-                    compact: true,
-                  ),
-                ),
-              );
-            },
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.only(bottom: 20),
+          sliver: SliverToBoxAdapter(
+            child: _Section(
+              title: 'New in the FitMatrix',
+              subtitle: 'Freshly added venues',
+              child: payload.newest.isEmpty
+                  ? const _EmptyPlaceholder(message: 'No venues added yet.')
+                  : GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        mainAxisExtent: 280,
+                      ),
+                      itemCount: payload.newest.length,
+                      itemBuilder: (context, index) {
+                        final place = payload.newest[index];
+                        return PlaceCard(
+                          place: place,
+                          onTap: () => context.go('/places/${place.slug}'),
+                        );
+                      },
+                    ),
+            ),
           ),
         ),
       ),
@@ -158,6 +135,63 @@ class _NewestSection extends StatelessWidget {
             onTap: () => context.go('/places/${place.slug}'),
           );
         },
+      ),
+    );
+  }
+}
+
+class _TrendingList extends StatelessWidget {
+  const _TrendingList({required this.places});
+  final List<Place> places;
+
+  @override
+  Widget build(BuildContext context) {
+    if (places.isEmpty) {
+      return const _EmptyPlaceholder(
+        message: 'Trending venues will appear here soon.',
+      );
+    }
+    return SizedBox(
+      height: 300,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: places.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (context, index) {
+          final place = places[index];
+          return SizedBox(
+            width: 260,
+            child: PlaceCard(
+              place: place,
+              onTap: () => context.go('/places/${place.slug}'),
+              compact: true,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _EmptyPlaceholder extends StatelessWidget {
+  const _EmptyPlaceholder({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 160,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: MatrixColors.mint.withOpacity(0.4)),
+      ),
+      child: Text(
+        message,
+        style: Theme.of(
+          context,
+        ).textTheme.bodyMedium?.copyWith(color: MatrixColors.muted),
+        textAlign: TextAlign.center,
       ),
     );
   }

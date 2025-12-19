@@ -115,11 +115,11 @@ class PlaceListScreen extends ConsumerWidget {
                 onRefresh: () async => ref.refresh(placeListProvider.future),
                 child: GridView.builder(
                   padding: const EdgeInsets.only(bottom: 20),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: isWide ? 4 : isTablet ? 3 : 2,
-                    mainAxisSpacing: 14,
-                    crossAxisSpacing: 14,
-                    childAspectRatio: 0.74,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    mainAxisExtent: 300,
                   ),
                   itemCount: items.length,
                   itemBuilder: (context, index) {
@@ -127,6 +127,7 @@ class PlaceListScreen extends ConsumerWidget {
                     return PlaceCard(
                       place: place,
                       onTap: () => context.go('/places/${place.slug}'),
+                      compact: true,
                     );
                   },
                 ),

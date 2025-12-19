@@ -26,141 +26,73 @@ class PlaceCard extends StatelessWidget {
     final heroUrl = _resolveImage(
       place.heroImage ?? (place.gallery.isNotEmpty ? place.gallery.first : null),
     );
-
-    final bool isSvg = heroUrl != null && heroUrl.toLowerCase().endsWith('.svg');
+    final isSvg = heroUrl != null && heroUrl.toLowerCase().endsWith('.svg');
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final width = constraints.maxWidth;
-
-        double scale;
-        if (width < 160) {
-          scale = 0.72;
-        } else if (width < 185) {
-          scale = 0.82;
-        } else if (width < 215) {
-          scale = 0.92;
-        } else {
-          scale = 1.00;
-        }
-
-        final double fontBase = 14 * scale;
-        final double chipPad = 6 * scale;
+        final hasBoundedHeight =
+            constraints.hasBoundedHeight && constraints.maxHeight.isFinite;
+        final showDescription =
+            !compact && (!hasBoundedHeight || constraints.maxHeight >= 320);
+        final details = _DetailsSection(
+          place: place,
+          showDescription: showDescription,
+          constrained: hasBoundedHeight,
+          trailing: trailing,
+          onTap: onTap,
+        );
 
         return MatrixCard(
           onTap: onTap,
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: hasBoundedHeight
+                ? MainAxisSize.max
+                : MainAxisSize.min,
             children: [
-              // =========================
-              // IMAGE SECTION
-              // =========================
               ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: (heroUrl == null || isSvg)
-                      ? Container(
-                          color: MatrixColors.mint.withOpacity(0.3),
-                          child: const Icon(Icons.broken_image, size: 50, color: Colors.red),
-                        )
-                      : Image.network(
-                          'http://127.0.0.1:8000/proxy-image/?url=${Uri.encodeComponent(heroUrl)}',
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              const Center(child: Icon(Icons.broken_image, size: 50, color: Colors.red)),
+                borderRadius: BorderRadius.circular(18),
+                child: Stack(
+                  children: [
+                    AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: (heroUrl == null || isSvg)
+                          ? Container(color: MatrixColors.mint.withOpacity(0.4))
+                          : CachedNetworkImage(
+                              imageUrl: heroUrl,
+                              fit: BoxFit.cover,
+                              placeholder: (context, _) => Container(
+                                color: MatrixColors.mint.withOpacity(0.3),
+                              ),
+                              errorWidget: (context, _, __) => Container(
+                                color: MatrixColors.mint.withOpacity(0.4),
+                              ),
+                            ),
+                    ),
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      child: Chip(
+                        backgroundColor: Colors.white.withOpacity(0.9),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
                         ),
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              // =========================
-              // NAME
-              // =========================
-              Text(
-                place.name,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: MatrixColors.ink,
-                      fontWeight: FontWeight.w800,
-                      fontSize: fontBase + 2,
-                    ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-
-              const SizedBox(height: 4),
-
-              // =========================
-              // CITY + PRICE
-              // =========================
-              Text(
-                '${place.city} | ${place.priceDisplay}',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: MatrixColors.muted,
-                      fontSize: fontBase - 1,
-                    ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-
-              const SizedBox(height: 6),
-
-              // =========================
-              // SUMMARY
-              // =========================
-              if (!compact)
-                Text(
-                  place.summary ?? place.tagline ?? 'Premium multi-zone facility.',
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontSize: fontBase - 2,
-                      ),
-                ),
-
-              const SizedBox(height: 6),
-
-              // =========================
-              // BOTTOM ROW
-              // =========================
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // CHIP
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: chipPad,
-                      vertical: chipPad * 0.4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: MatrixColors.mint.withOpacity(0.35),
-                      borderRadius: BorderRadius.circular(8 * scale),
-                    ),
-                    child: Text(
-                      '${place.ratingAvg.toStringAsFixed(1)} ★',
-                      style: TextStyle(
-                        fontSize: fontBase,
-                        fontWeight: FontWeight.w600,
-                        color: MatrixColors.ink,
+                        label: Text(
+                          place.facilityType,
+                          style: const TextStyle(
+                            color: MatrixColors.ink,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-
-                  // BUTTON
-                  Transform.scale(
-                    scale: scale,
-                    alignment: Alignment.centerRight,
-                    child: trailing ??
-                        MatrixButton(
-                          label: 'View',
-                          variant: MatrixButtonVariant.ghost,
-                          onPressed: onTap,
-                        ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(height: 10),
+              if (hasBoundedHeight) Expanded(child: details) else details,
             ],
           ),
         );
@@ -185,3 +117,95 @@ class PlaceCard extends StatelessWidget {
   }
 }
 
+class _DetailsSection extends StatelessWidget {
+  const _DetailsSection({
+    required this.place,
+    required this.showDescription,
+    required this.constrained,
+    this.trailing,
+    this.onTap,
+  });
+
+  final Place place;
+  final bool showDescription;
+  final bool constrained;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final mutedStyle = Theme.of(
+      context,
+    ).textTheme.bodyMedium?.copyWith(color: MatrixColors.muted);
+    final infoBlock = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          place.name,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: MatrixColors.ink,
+            fontWeight: FontWeight.w800,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '${place.city} • ${place.priceDisplay}',
+          style: mutedStyle,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        if (showDescription) ...[
+          const SizedBox(height: 8),
+          Text(
+            place.summary ?? place.tagline ?? 'Premium multi-zone facility.',
+            maxLines: constrained ? 2 : 4,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
+      ],
+    );
+
+    final header = constrained ? Expanded(child: infoBlock) : infoBlock;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: constrained ? MainAxisSize.max : MainAxisSize.min,
+      children: [
+        header,
+        const SizedBox(height: 12),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Chip(
+              backgroundColor: MatrixColors.mint.withOpacity(0.3),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              label: Text(
+                '${place.ratingAvg.toStringAsFixed(1)} ★',
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child:
+                    trailing ??
+                    MatrixButton(
+                      label: 'View',
+                      variant: MatrixButtonVariant.ghost,
+                      onPressed: onTap,
+                    ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}

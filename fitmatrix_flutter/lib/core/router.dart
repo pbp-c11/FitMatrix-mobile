@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../data/models/wishlist.dart';
 import '../data/auth_controller.dart';
 import '../widgets/matrix_background.dart';
 import '../widgets/matrix_nav_bar.dart';
@@ -18,6 +19,7 @@ import '../features/profile/profile_screen.dart';
 import '../features/sessions/sessions_screen.dart';
 import '../features/trainers/trainer_detail_screen.dart';
 import '../features/trainers/trainer_list_screen.dart';
+import '../features/wishlist/collection_detail_screen.dart';
 import '../features/wishlist/wishlist_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -35,9 +37,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (!authed && protected.contains(state.matchedLocation)) {
         return '/login';
       }
-      if (authed && goingToAuth) {
-        return '/home';
-      }
+      if (authed && goingToAuth) return null;
       return null;
     },
     routes: [
@@ -112,16 +112,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
           GoRoute(
             path: '/wishlist/collection/:id',
-            name:'collection-detail',
-            builder: (context, state){
-              final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
-              final collection = state.extra as WishlistCollection?;
-
-              if (collection == null) {
-                // sementara: balikin ke wishlist atau tampilkan screen yang fetch by id
-                return const WishlistScreen(); // atau ErrorScreen sederhana
-              }
-
+            name: 'collection-detail',
+            builder: (context, state) {
+              final collection = state.extra as WishlistCollection;
               return CollectionDetailScreen(collection: collection);
             },
           ),

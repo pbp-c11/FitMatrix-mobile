@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Count, Min, Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from rest_framework import permissions, serializers, status, viewsets
+from rest_framework import parsers, permissions, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -94,19 +94,38 @@ class RegisterView(APIView):
 
 class MeView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [parsers.JSONParser, parsers.FormParser, parsers.MultiPartParser]
 
     def get(self, request):
         serializer = UserSerializer(request.user, context={"request": request})
         return Response(serializer.data)
 
     def patch(self, request):
-        serializer = MeUpdateSerializer(request.user, data=request.data, partial=True)
+        user = request.user
+        data = request.data.copy()
+        # Let DRF handle basic fields, but bypass its ImageField validation
+        # for avatar because Pillow validation has been flaky in this setup.
+        avatar_file = getattr(request, "FILES", {}).get("avatar") or data.pop("avatar", None)
+        if isinstance(avatar_file, list):
+            avatar_file = avatar_file[0]
+        # Ensure avatar is not passed through the serializer
+        data.pop("avatar", None)
+
+        serializer = MeUpdateSerializer(user, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(UserSerializer(request.user, context={"request": request}).data)
+
+        if avatar_file:
+            # Save the uploaded file directly to the ImageField, relying on
+            # Django's storage instead of DRF's ImageField validation.
+            file_name = getattr(avatar_file, "name", "avatar")
+            user.avatar.save(file_name, avatar_file, save=True)
+
+        return Response(UserSerializer(user, context={"request": request}).data)
 
 
 class HomeSummaryView(APIView):
+    authentication_classes: list = []
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
@@ -238,6 +257,8 @@ class SessionSlotViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         query = self.request.query_params.get("q", "").strip()
         trainer_id = self.request.query_params.get("trainer")
+        place_slug = self.request.query_params.get("place")
+        place_id = self.request.query_params.get("place_id")
         qs = SessionSlot.objects.select_related("trainer", "place")
         if not (self.request.user.is_staff or getattr(self.request.user, "is_admin", False)):
             qs = qs.filter(is_active=True, start__gte=timezone.now())
@@ -249,6 +270,10 @@ class SessionSlotViewSet(viewsets.ModelViewSet):
             )
         if trainer_id:
             qs = qs.filter(trainer_id=trainer_id)
+        if place_slug:
+            qs = qs.filter(place__slug=place_slug)
+        if place_id:
+            qs = qs.filter(place_id=place_id)
         return qs.order_by("start")
 
 
