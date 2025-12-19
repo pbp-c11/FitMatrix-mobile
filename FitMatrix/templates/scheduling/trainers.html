@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Trainers · FitMatrix{% endblock %}
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 pb-20 space-y-14">
+  <header class="matrix-hero-grid matrix-glass matrix-glow relative overflow-hidden">
+    <div class="matrix-hero-grid"></div>
+    <div class="relative space-y-6 py-10">
+      <p class="matrix-label">Performance coaches</p>
+      <h1 class="text-4xl sm:text-[3rem] font-semibold leading-tight max-w-3xl">Find a trainer aligned with your focus.</h1>
+      <p class="text-forest-muted max-w-2xl">
+        Search by specialty, compare pricing, and explore availability to book your next personalised session.
+      </p>
+    </div>
+  </header>
+
+  <form method="get" action="" class="matrix-search-form">
+    <div class="matrix-search-form__field--query">
+      <label for="q">Search trainer</label>
+      <input id="q" name="q" type="text" value="{{ query }}" class="matrix-input" placeholder="Name or keyword" />
+    </div>
+    <div class="matrix-search-form__field--price">
+      <label for="focus">Focus area</label>
+      <input id="focus" name="focus" type="text" value="{{ focus }}" class="matrix-input" placeholder="Strength, mobility, recovery" />
+    </div>
+    <div class="matrix-search-form__field--action">
+      <label>&nbsp;</label>
+      <button type="submit" class="matrix-btn w-full">Filter</button>
+    </div>
+  </form>
+
+  <div class="matrix-grid">
+    {% for trainer in trainers %}
+      <article class="matrix-card" data-variant="glass">
+        <div class="matrix-card__body space-y-4">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h2 class="matrix-card__title">{{ trainer.name }}</h2>
+              <p class="text-sm text-forest-muted">{{ trainer.specialties }}</p>
+            </div>
+            {% if request.user.is_authenticated %}
+              <button
+                type="button"
+                class="matrix-card__wishlist"
+                data-wishlist-toggle
+                data-url="{% url 'wishlist:toggle' 'trainer' trainer.pk %}"
+                data-active="{% if trainer.id in wishlist_trainers %}true{% else %}false{% endif %}"
+                data-label-active="♥"
+                data-label-inactive="♡"
+                aria-pressed="{% if trainer.id in wishlist_trainers %}true{% else %}false{% endif %}"
+                title="Save trainer"
+              >
+                {% if trainer.id in wishlist_trainers %}♥{% else %}♡{% endif %}
+              </button>
+            {% else %}
+              <a href="{% url 'accounts:login' %}" class="matrix-card__wishlist" title="Login to save">♡</a>
+            {% endif %}
+          </div>
+          <div class="flex flex-wrap items-center gap-3 text-sm text-forest-muted">
+            <span class="matrix-pill">Rp {{ trainer.price_per_session|floatformat:0 }} / session</span>
+            <span class="matrix-pill">{{ trainer.likes }} likes</span>
+            <span class="matrix-pill">Rating {{ trainer.rating_avg|floatformat:1 }}</span>
+            {% if trainer.next_available %}
+              <span class="matrix-pill">Next {{ trainer.next_available|date:"M d, H:i" }}</span>
+            {% endif %}
+          </div>
+          <a href="{% url 'scheduling:trainer-detail' trainer.pk %}" class="matrix-btn" data-variant="ghost">View details</a>
+        </div>
+      </article>
+    {% empty %}
+      <div class="matrix-empty-state">
+        <h3>No trainers found</h3>
+        <p>Adjust your filters or explore all trainers to see available specialists.</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

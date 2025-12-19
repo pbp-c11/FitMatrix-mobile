@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
+  <defs>
+    <linearGradient id="gradPulse" x1="0%" x2="100%" y1="50%" y2="50%">
+      <stop offset="0%" stop-color="#ff3d6a" />
+      <stop offset="100%" stop-color="#ffa937" />
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#gradPulse)" rx="36" />
+  <path d="M60 220 L160 220 L200 150 L260 300 L320 120 L380 260 L420 200 L520 200" stroke="#ffffff" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.92" />
+  <text x="66" y="96" font-family="'Montserrat', sans-serif" font-size="54" font-weight="700" fill="#ffffff">Pulse Track</text>
+  <text x="70" y="140" font-family="'Montserrat', sans-serif" font-size="26" fill="#fff5ed" opacity="0.9">HIIT grids &amp; turf sprints</text>
+</svg>

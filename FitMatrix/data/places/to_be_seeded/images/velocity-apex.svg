@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
+  <defs>
+    <linearGradient id="gradVelocity" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#0f9f8e" />
+      <stop offset="100%" stop-color="#1dd57b" />
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#gradVelocity)" rx="36" />
+  <path d="M120 290 L240 140 L320 220 L420 80 L520 240" stroke="#ffffff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85" />
+  <circle cx="520" cy="240" r="32" fill="#ffffff" opacity="0.9" />
+  <text x="48" y="86" font-family="'Montserrat', sans-serif" font-size="54" font-weight="700" fill="#ffffff">Velocity Apex</text>
+  <text x="50" y="132" font-family="'Montserrat', sans-serif" font-size="28" fill="#e9fff6" opacity="0.9">Power &amp; data-driven training</text>
+</svg>

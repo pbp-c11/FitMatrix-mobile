@@ -1,0 +1,60 @@
+# Root gitignore for MarvelMatrix mono-repo
+
+# Codex CLI / AI tooling
+.codex/
+.codex-cache/
+.codex.json
+.codexrc
+.codex.local
+.openai/
+
+# Secrets / local config
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+**/.django_secret_key
+**/local.properties
+**/google-services.json
+**/GoogleService-Info.plist
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editors
+.idea/
+.vscode/
+*.iml
+
+# Python / Django (FitMatrix)
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+db.sqlite3
+*.log
+venv/
+.venv/
+
+# Django static/media build artifacts
+FitMatrix/staticfiles/
+FitMatrix/media/
+
+# Flutter / Android (fitmatrix_flutter)
+fitmatrix_flutter/.dart_tool/
+fitmatrix_flutter/.flutter-plugins
+fitmatrix_flutter/.flutter-plugins-dependencies
+fitmatrix_flutter/.packages
+fitmatrix_flutter/build/
+
+# Node / web (if any)
+node_modules/
+

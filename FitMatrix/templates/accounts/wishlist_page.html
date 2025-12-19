@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}My Wishlist Collections | FitMatrix{% endblock %}
+
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 py-12">
+  <h1 class="text-2xl font-semibold text-[#0E3A22] mb-6">Wishlist Collections</h1>
+
+  {% if collections %}
+    <div id="wishlist-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+      {% for col in collections %}
+        <div class="wishlist-card rounded-3xl bg-white/70 border border-[#C9FFD4] shadow-sm p-6 flex flex-col hover:shadow-lg transition-all duration-300"
+             data-collection-id="{{ col.id }}">
+          
+          <!-- Header -->
+          <div class="flex justify-between items-start mb-3">
+            <h2 class="text-lg font-bold text-[#12391E]">{{ col.name }}</h2>
+            <button
+              type="button"
+              class="text-xs text-red-500 hover:underline delete-btn"
+              data-delete-url="{% url 'accounts:delete_collection' col.id %}"
+              data-name="{{ col.name }}">
+              Delete
+            </button>
+          </div>
+
+          {% if col.description %}
+            <p class="text-sm text-[#3E6147] mb-4">{{ col.description }}</p>
+          {% endif %}
+
+          <!-- Footer -->
+          <div class="mt-auto flex justify-between items-center pt-8">
+            <p class="text-xs text-[#497D5E]">
+              {{ col.items.count }} {{ col.items.count|pluralize:"place,places" }}
+            </p>
+            <a href="{% url 'accounts:wishlist_collection_detail' col.id %}"
+               class="text-sm text-[#0E3A22] hover:underline font-medium">
+              View Collection →
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+    <p id="empty-state" class="text-gray-500 mt-8 {% if collections %}hidden{% endif %}"> You don’t have any wishlist collections yet. </p>
+</section>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  // ====== PORTAL & TOAST ======
+  const portal = document.getElementById("portal-root") || document.body;
+  let toast = document.getElementById("toast");
+
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast";
+    toast.className = "hidden fixed top-6 right-6 px-4 py-3 rounded-xl text-sm font-medium shadow-md border pointer-events-none";
+    // gaya aman maksimum
+    toast.style.zIndex = "2147483647";
+    toast.style.position = "fixed";
+    toast.style.transition = "opacity .2s ease, transform .2s ease";
+    portal.appendChild(toast);
+  }
+
+  function showToast(message, type = "success") {
+    toast.textContent = message;
+    toast.className = "fixed top-6 right-6 px-4 py-3 rounded-xl text-sm font-medium shadow-md border pointer-events-none";
+    toast.classList.add(type === "error"
+      ? "bg-green-100" : "text-green-800","border-green-300" , "bg-green-100","text-green-800","border-green-300"
+    );
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-6px)";
+    // force reflow
+    void toast.offsetHeight;
+    toast.classList.remove("hidden");
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateY(-6px)";
+      setTimeout(() => toast.classList.add("hidden"), 200);
+    }, 2500);
+  }
+
+  // ====== CSRF ======
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      for (let cookie of document.cookie.split(";")) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + "=")) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  const csrftoken = getCookie("csrftoken");
+
+  // ====== GRID & EMPTY STATE ======
+  const grid = document.querySelector("#wishlist-grid");
+  const empty = document.querySelector("#empty-state");
+
+  function checkEmptyState() {
+    // Jika tidak ada grid (memang kosong dari awal), pastikan empty tampil
+    if (!grid) {
+      if (empty) empty.classList.remove("hidden");
+      return;
+    }
+    // Jika grid ada tapi sudah tidak ada card
+    const hasCard = !!grid.querySelector(".wishlist-card");
+    if (!hasCard) {
+      grid.classList.add("hidden");
+      if (empty) empty.classList.remove("hidden");
+    }
+  }
+
+  // ====== DELETE HANDLER ======
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const card = btn.closest(".wishlist-card");
+      const deleteUrl = btn.dataset.deleteUrl;
+
+      try {
+        const res = await fetch(deleteUrl, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": csrftoken,
+            "X-Requested-With": "XMLHttpRequest",
+            "Accept": "application/json",
+          },
+        });
+
+        if (!res.ok) throw new Error(await res.text());
+
+        // animasi hilang lalu remove
+        card.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+        card.style.opacity = "0";
+        card.style.transform = "scale(0.95)";
+
+        setTimeout(() => {
+          card.remove();
+          checkEmptyState(); // ✅ langsung cek & tampilkan empty state kalau terakhir
+        }, 300);
+
+        showToast("Collection deleted successfully.");
+      } catch (err) {
+        console.error(err);
+        showToast("Failed to delete collection.", "error");
+      }
+    });
+  });
+
+  // safety: kalau halaman dibuka memang kosong, pastikan state benar
+  checkEmptyState();
+});
+</script>
+
+
+{% endblock %}

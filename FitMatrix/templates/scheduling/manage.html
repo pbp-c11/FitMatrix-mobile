@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}My bookings · FitMatrix{% endblock %}
+{% block content %}
+<section class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-10 pb-20 space-y-12">
+  <header class="matrix-glass matrix-glow px-6 sm:px-8 py-10 rounded-[32px] space-y-4">
+    <h1 class="text-3xl sm:text-[2.4rem] font-semibold leading-tight">My bookings</h1>
+    <p class="text-forest-muted">Track your upcoming and past trainer sessions. Reschedule or cancel directly from here.</p>
+  </header>
+
+  <section class="space-y-6">
+    <div class="flex items-center justify-between gap-4">
+      <h2 class="matrix-section-title">Upcoming sessions</h2>
+      <a href="{% url 'scheduling:sessions' %}" class="matrix-link">Find more slots</a>
+    </div>
+    <div class="space-y-4">
+      {% for booking in upcoming %}
+        <article class="matrix-glass matrix-shadow border border-transparent rounded-2xl p-5">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="space-y-1">
+              <h3 class="text-lg font-semibold">{{ booking.slot.trainer.name }}</h3>
+              <p class="text-sm text-white/60">{{ booking.slot.place.name }} · {{ booking.slot.start|date:"M d, Y H:i" }}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <form method="post" action="{% url 'scheduling:booking-cancel' booking.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="matrix-btn" data-variant="ghost">Cancel</button>
+              </form>
+              <a href="{% url 'scheduling:booking-reschedule' booking.pk %}" class="matrix-btn" data-variant="ghost">Reschedule</a>
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <p class="text-white/70">No upcoming sessions booked.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="space-y-6">
+    <h2 class="matrix-section-title">Past sessions</h2>
+    <div class="space-y-4">
+      {% for booking in past %}
+        <article class="matrix-glass matrix-shadow border border-transparent rounded-2xl p-5">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h3 class="text-lg font-semibold">{{ booking.slot.trainer.name }}</h3>
+              <p class="text-sm text-white/60">{{ booking.slot.place.name }} · {{ booking.slot.start|date:"M d, Y H:i" }}</p>
+            </div>
+            <span class="matrix-pill">{{ booking.get_status_display }}</span>
+          </div>
+        </article>
+      {% empty %}
+        <p class="text-white/70">No past sessions recorded.</p>
+      {% endfor %}
+    </div>
+  </section>
+</section>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% if page_obj.has_other_pages %}
+<nav class="md:flex md:items-center md:justify-between mt-6" aria-label="Pagination">
+  <a href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}" class="btn glass px-3 py-2 {% if not page_obj.has_previous %}opacity-50 pointer-events-none{% endif %}">Prev</a>
+  <div class="flex items-center justify-center gap-2 mt-4 md:mt-0">
+    {% for num in page_obj.paginator.page_range %}
+      {% if num == page_obj.number %}
+        <span class="px-3 py-2 rounded-xl bg-white/30">{{ num }}</span>
+      {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+        <a href="?page={{ num }}" class="px-3 py-2 rounded-xl hover:bg-white/20 transition">{{ num }}</a>
+      {% endif %}
+    {% endfor %}
+  </div>
+  <a href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}" class="btn glass px-3 py-2 {% if not page_obj.has_next %}opacity-50 pointer-events-none{% endif %}">Next</a>
+</nav>
+{% endif %}
