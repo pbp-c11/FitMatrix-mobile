@@ -8,39 +8,38 @@ class MatrixCard extends StatelessWidget {
     required this.child,
     this.padding,
     this.onTap,
-    this.borderRadius,
   });
 
   final Widget child;
   final EdgeInsetsGeometry? padding;
   final VoidCallback? onTap;
-  final BorderRadius? borderRadius;
 
   @override
   Widget build(BuildContext context) {
-    final radius = borderRadius ?? BorderRadius.circular(28);
-    final card = Container(
+    final content = Container(
       padding: padding ?? const EdgeInsets.all(16),
-      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        borderRadius: radius,
+        borderRadius: BorderRadius.zero,
         color: MatrixColors.card,
-        border: Border.all(color: MatrixColors.border.withOpacity(0.7)),
+        border: Border.all(color: MatrixColors.border),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x14063A21),
-            blurRadius: 24,
+            color: Color(0x290D452B),
+            blurRadius: 26,
             offset: Offset(0, 16),
           ),
         ],
       ),
       child: child,
     );
-    if (onTap == null) return card;
+    if (onTap == null) return content;
     return Material(
       color: Colors.transparent,
-      borderRadius: radius,
-      child: InkWell(borderRadius: radius, onTap: onTap, child: card),
+      child: InkWell(
+        borderRadius: BorderRadius.zero,
+        onTap: onTap,
+        child: content,
+      ),
     );
   }
 }

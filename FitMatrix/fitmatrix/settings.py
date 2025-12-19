@@ -52,8 +52,6 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.proxy.runpod.net",  # optional wildcard (Django 4.1+ supports *)
     "http://10.0.2.2:8000",
     "http://127.0.0.1:8000",
-    "http://10.0.2.2:9000",
-    "http://127.0.0.1:9000",
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -64,6 +62,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True # For development ease, can be removed in production
+
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 CSRF_COOKIE_SECURE = True
@@ -87,7 +86,7 @@ INSTALLED_APPS = [
     "wishlist",
     "reviews",
     "api",
-    "corsheaders",
+    "corsheaders"
 ]
 
 MIDDLEWARE = [

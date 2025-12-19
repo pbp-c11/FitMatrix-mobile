@@ -1,43 +1,60 @@
-# Codex / AI assistant artifacts
+# Root gitignore for MarvelMatrix mono-repo
+
+# Codex CLI / AI tooling
 .codex/
-.codex-cli/
+.codex-cache/
+.codex.json
+.codexrc
+.codex.local
 .openai/
-*.codex.log
 
-# Python virtual environments
-venv/
-.venv/
+# Secrets / local config
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+**/.django_secret_key
+**/local.properties
+**/google-services.json
+**/GoogleService-Info.plist
 
-# Django / Python caches
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-.pytest_cache/
-.coverage
-coverage.xml
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
 
-# Node / tooling
-node_modules/
-
-# IDE / editor
+# IDE / Editors
 .idea/
 .vscode/
 *.iml
 
-# OS junk
-Thumbs.db
-Desktop.ini
-.DS_Store
+# Python / Django (FitMatrix)
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+db.sqlite3
+*.log
+venv/
+.venv/
 
-# Flutter / Android / iOS build output
-**/build/
-**/.dart_tool/
-**/.flutter-plugins
-**/.flutter-plugins-dependencies
-**/.packages
-**/pubspec.lock
+# Django static/media build artifacts
+FitMatrix/staticfiles/
+FitMatrix/media/
 
-# Ignore Dhea mobile + backend tree (only commit Kalfin version)
-FitMAtrix-mobile-dhea/
+# Flutter / Android (fitmatrix_flutter)
+fitmatrix_flutter/.dart_tool/
+fitmatrix_flutter/.flutter-plugins
+fitmatrix_flutter/.flutter-plugins-dependencies
+fitmatrix_flutter/.packages
+fitmatrix_flutter/build/
+
+# Node / web (if any)
+node_modules/
 
