@@ -38,7 +38,6 @@
       <a href="#account" class="block px-3 py-2 rounded-xl hover:bg-white/10">Account</a>
       <a href="#security" class="block px-3 py-2 rounded-xl hover:bg-white/10">Security</a>
       <a href="#history" class="block px-3 py-2 rounded-xl hover:bg-white/10">History</a>
-      <a href="#wishlist" class="block px-3 py-2 rounded-xl hover:bg-white/10">Wishlist</a>
     </nav>
     <div class="md:col-span-2 space-y-8">
       <section id="account" class="glass card space-y-6">
@@ -163,46 +162,6 @@
             <p class="text-white/60">No activity yet.</p>
           {% endif %}
         </div>
-      </section>
-      <section id="wishlist" class="glass card space-y-6">
-        <div>
-          <h3 class="text-xl font-semibold">Wishlist</h3>
-          <p class="text-sm text-white/70">Places and trainers you love.</p>
-        </div>
-        {% if wishlist_page.object_list %}
-          <div class="grid sm:grid-cols-2 gap-4" id="wishlist-grid">
-            {% for item in wishlist_page %}
-              <article class="glass p-4 bg-white/5 flex flex-col gap-2">
-                <div class="flex items-center justify-between">
-                  <h5 class="font-semibold">{% if item.place %}{{ item.place.name }}{% else %}{{ item.trainer.name }}{% endif %}</h5>
-                  <button
-                    type="button"
-                    class="btn glass px-3"
-                    data-wishlist-toggle
-                    data-url="{% if item.place %}{% url 'wishlist:toggle' 'place' item.place.id %}{% else %}{% url 'wishlist:toggle' 'trainer' item.trainer.id %}{% endif %}"
-                    data-active="true"
-                    data-label-active="♥"
-                    data-label-inactive="♡"
-                    aria-pressed="true"
-                  >
-                    ♥
-                  </button>
-                </div>
-                <p class="text-sm text-white/70">{% if item.place %}{{ item.place.city }}{% else %}{{ item.trainer.specialties }}{% endif %}</p>
-              </article>
-            {% endfor %}
-          </div>
-          {% include "components/paginator.html" with page_obj=wishlist_page %}
-          <div id="profile-wishlist-empty" class="text-center text-white/70 py-10 hidden">
-            <p>Wishlist is empty.</p>
-            <a href="{% url 'search:results' %}" class="text-[var(--green-300)] hover:text-[var(--green-200)]">Explore places</a>
-          </div>
-        {% else %}
-          <div class="text-center text-white/70 py-10" id="profile-wishlist-empty">
-            <p>Wishlist is empty.</p>
-            <a href="{% url 'search:results' %}" class="text-[var(--green-300)] hover:text-[var(--green-200)]">Explore places</a>
-          </div>
-        {% endif %}
       </section>
     </div>
   </div>
