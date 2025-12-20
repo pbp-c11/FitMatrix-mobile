@@ -35,7 +35,7 @@
 
           {% url 'home' as home_url %}
           {% url 'search:results' as search_url %}
-          {% url 'scheduling:sessions' as sessions_url %}
+          {% url 'scheduling:trainers' as trainers_url %}
           {% url 'scheduling:booking-manage' as booking_manage_url %}
           {% url 'accounts:wishlist_page' as wishlist_url %}
           {% with match=request.resolver_match url_name=match.url_name|default:'' %}
@@ -44,7 +44,7 @@
         <nav class="matrix-nav hidden lg:flex items-center gap-10 text-[20px] tracking-[0.25em]" style="font-family: 'Koulen', system-ui, sans-serif;">
           <a href="{{ home_url }}" {% if request.path == home_url %}aria-current="page"{% endif %}>Home</a>
           <a href="{{ search_url }}" {% if match and match.app_name == 'search' %}aria-current="page"{% endif %}>Places</a>
-          <a href="{{ sessions_url }}" {% if match and match.app_name == 'scheduling' and url_name|slice:':7' != 'booking' %}aria-current="page"{% endif %}>Sessions</a>
+          <a href="{{ trainers_url }}" {% if match and match.app_name == 'scheduling' and url_name|slice:':7' != 'booking' %}aria-current="page"{% endif %}>Trainers</a>
           <a href="{{ wishlist_url }}" {% if match and match.url_name == 'list' %}aria-current="page"{% endif %}>Wishlist</a>
 
           {# ==== ADMIN PANEL (Desktop) ==== #}
@@ -114,7 +114,7 @@
           <div class="mt-3 px-6 py-5 flex flex-col gap-4 rounded-[26px] bg-white/80 backdrop-blur border border-black/10" style="font-family: 'Koulen', system-ui, sans-serif;">
             <a href="{% url 'home' %}" class="nav-underline">Home</a>
             <a href="{% url 'search:results' %}" class="nav-underline">Places</a>
-            <a href="{% url 'scheduling:sessions' %}">Sessions</a>
+            <a href="{% url 'scheduling:trainers' %}">Trainers</a>
             <a href="{% url 'wishlist:list' %}">Wishlist</a>
 
             {# ==== ADMIN PANEL (Mobile) ==== #}
@@ -169,7 +169,7 @@
               <h4 class="text-[#B5EB54] text-xs tracking-[0.25em] mb-3 font-[Koulen]">PRODUCTS</h4>
               <ul class="space-y-2 text-white/85 text-[15px]">
                 <li><a href="{% url 'search:results' %}" class="hover:text-white transition">Venues</a></li>
-                <li><a href="{% url 'scheduling:sessions' %}" class="hover:text-white transition">Sessions</a></li>
+                <li><a href="{% url 'scheduling:trainers' %}" class="hover:text-white transition">Trainers</a></li>
               </ul>
             </div>
 

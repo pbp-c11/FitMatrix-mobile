@@ -1,11 +1,12 @@
 from __future__ import annotations
-
+from django.db import transaction
 from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 
 from accounts.models import ActivityLog
 
-from .models import Booking
+from .models import Booking, Trainer
+from.services import generate_slots_for_trainer
 
 
 @receiver(pre_save, sender=Booking)
@@ -52,3 +53,10 @@ def booking_delete_log(sender, instance: Booking, **_: object) -> None:  # noqa:
             type=ActivityLog.Types.BOOKING_CANCELLED,
             meta={"booking_id": instance.pk, "slot": instance.slot_id, "deleted": True},
         )
+
+@receiver(post_save, sender=Trainer)
+def trainer_generate_slots(sender, instance: Trainer, created: bool, **_: object) -> None:  # noqa: ARG001
+    def _run() -> None:
+        generate_slots_for_trainer(instance, replace_future=True)
+
+    transaction.on_commit(_run)

@@ -15,27 +15,29 @@ from .forms import BookingRequestForm, BookingRescheduleForm
 from .models import Booking, SessionSlot, Trainer
 
 
+from django.db.models import Count, Min, Q
+from django.utils import timezone
+
 def trainer_list(request: HttpRequest) -> HttpResponse:
     query = request.GET.get("q", "").strip()
     focus = request.GET.get("focus", "").strip()
 
     trainers = Trainer.objects.select_related("place").filter(is_active=True)
-    
-    # Filter by date availability
-    today = timezone.now().date()
-    trainers = trainers.filter(
-        Q(start_date__isnull=True) | Q(start_date__lte=today),
-        Q(end_date__isnull=True) | Q(end_date__gte=today),
-    )
-    
+
     if query:
         trainers = trainers.filter(Q(name__icontains=query) | Q(specialties__icontains=query))
     if focus:
         trainers = trainers.filter(specialties__icontains=focus)
 
     trainers = trainers.annotate(
-        next_available=Min("slots__start"),
-        active_slots=Count("slots", filter=Q(slots__start__gte=timezone.now(), slots__is_active=True)),
+        next_available=Min(
+            "slots__start",
+            filter=Q(slots__start__gte=timezone.now(), slots__is_active=True),
+        ),
+        active_slots=Count(
+            "slots",
+            filter=Q(slots__start__gte=timezone.now(), slots__is_active=True),
+        ),
     ).order_by("-likes", "-rating_avg", "name")
 
     wishlist_trainers: set[int] = set()
@@ -49,8 +51,10 @@ def trainer_list(request: HttpRequest) -> HttpResponse:
         "query": query,
         "focus": focus,
         "wishlist_trainers": wishlist_trainers,
+        "today": timezone.now().date(),
     }
     return render(request, "scheduling/trainers.html", context)
+
 
 
 def trainer_detail(request: HttpRequest, pk: int) -> HttpResponse:

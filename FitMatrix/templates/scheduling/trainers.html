@@ -2,7 +2,10 @@
 {% block title %}Trainers · FitMatrix{% endblock %}
 {% block content %}
 <section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 pb-20 space-y-14">
-  <header class="matrix-hero-grid matrix-glass matrix-glow relative overflow-hidden">
+  <header class="matrix-gridline matrix-glass matrix-glow relative overflow-hidden
+              rounded-[32px] sm:rounded-[44px] lg:rounded-[56px]
+              px-6 sm:px-10 lg:px-14
+              py-10 sm:py-12">
     <div class="matrix-hero-grid"></div>
     <div class="relative space-y-6 py-10">
       <p class="matrix-label">Performance coaches</p>
@@ -55,20 +58,41 @@
               <a href="{% url 'accounts:login' %}" class="matrix-card__wishlist" title="Login to save">♡</a>
             {% endif %}
           </div>
-          <div class="flex flex-wrap items-center gap-3 text-sm text-forest-muted">
-            <span class="matrix-pill">Rp {{ trainer.price_per_session|floatformat:0 }} / session</span>
-            <span class="matrix-pill">{{ trainer.likes }} likes</span>
-            <span class="matrix-pill">Rating {{ trainer.rating_avg|floatformat:1 }}</span>
-            {% if trainer.place %}
-              <span class="matrix-pill">@ {{ trainer.place.name }}</span>
-            {% endif %}
-            {% if trainer.end_date %}
-              <span class="matrix-pill">Until {{ trainer.end_date|date:"M d, Y" }}</span>
-            {% endif %}
-            {% if trainer.next_available %}
-              <span class="matrix-pill">Next {{ trainer.next_available|date:"M d, H:i" }}</span>
-            {% endif %}
+          
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-2 text-sm text-forest-muted">
+              <span class="matrix-pill">Rp {{ trainer.price_per_session|floatformat:0 }} / session</span>
+
+              {% if trainer.place %}
+                <span class="matrix-pill">@ {{ trainer.place.name }}</span>
+              {% endif %}
+            </div>
+
+            <!-- ↓↓↓ AVAILABILITY ROW (lebih subtle, bukan semua pill ijo) -->
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-forest-muted/90">
+              {% if trainer.start_date and trainer.start_date > today %}
+                <span>
+                  <span class="font-semibold text-forest">Available from</span>
+                  {{ trainer.start_date|date:"M d, Y" }}
+                </span>
+              {% endif %}
+
+              {% if trainer.end_date %}
+                <span>
+                  <span class="font-semibold text-forest">Until</span>
+                  {{ trainer.end_date|date:"M d, Y" }}
+                </span>
+              {% endif %}
+
+              {% if trainer.next_available %}
+                <span>
+                  <span class="font-semibold text-forest">Next</span>
+                  {{ trainer.next_available|date:"M d, H:i" }}
+                </span>
+              {% endif %}
+            </div>
           </div>
+
           <a href="{% url 'scheduling:trainer-detail' trainer.pk %}" class="matrix-btn" data-variant="ghost">View details</a>
         </div>
       </article>

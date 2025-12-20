@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../core/theme.dart';
 import '../../data/api_service.dart';
@@ -63,8 +64,12 @@ class TrainerListScreen extends ConsumerWidget {
                 itemCount: items.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (context, index) {
-                  final trainer = items[index];
-                  return MatrixCard(
+                final trainer = items[index];
+                final nextFmt = DateFormat("MMM d, HH:mm"); // Dec 21, 10:00
+
+                return ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 170), 
+                  child: MatrixCard(
                     onTap: () => context.go('/trainers/${trainer.id}'),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,6 +83,8 @@ class TrainerListScreen extends ConsumerWidget {
                                 children: [
                                   Text(
                                     trainer.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleLarge
@@ -86,6 +93,8 @@ class TrainerListScreen extends ConsumerWidget {
                                   const SizedBox(height: 4),
                                   Text(
                                     trainer.specialties,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodyMedium
@@ -100,13 +109,13 @@ class TrainerListScreen extends ConsumerWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+
+                        const SizedBox(height: 10),
+
                         Wrap(
                           spacing: 8,
                           runSpacing: 6,
                           children: [
-                            Chip(label: Text('${trainer.likes} likes')),
-                            Chip(label: Text('${trainer.ratingAvg.toStringAsFixed(1)} ★')),
                             if (trainer.place != null)
                               Chip(
                                 label: Text(trainer.place!.name),
@@ -115,23 +124,32 @@ class TrainerListScreen extends ConsumerWidget {
                             if (trainer.nextAvailable != null)
                               Chip(
                                 label: Text(
-                                    'Next ${trainer.nextAvailable!.toLocal().toString().substring(5, 16)}'),
+                                  'Next ${nextFmt.format(trainer.nextAvailable!.toLocal())}',
+                                ),
+                              ),
+                            if (trainer.endDate != null)
+                              Chip(
+                                label: Text(
+                                  'Until ${DateFormat("MMM d, yyyy").format(trainer.endDate!.toLocal())}',
+                                ),
                               ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: MatrixButton(
+
+                        const SizedBox(height: 12),
+
+                        Align(alignment: Alignment.centerRight,
+                        child: MatrixButton(
                             label: 'Details',
                             variant: MatrixButtonVariant.ghost,
-                            onPressed: () => context.go('/trainers/${trainer.id}'),
-                          ),
+                            onPressed: () => context.go('/trainers/${trainer.id}'))
                         ),
                       ],
                     ),
-                  );
-                },
+                  ),
+                );
+              },
+
               ),
             ),
           ),

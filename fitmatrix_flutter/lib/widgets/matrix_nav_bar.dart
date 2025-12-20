@@ -21,7 +21,7 @@ class MatrixNavBar extends ConsumerWidget {
       destinations: [
         const NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
         const NavigationDestination(icon: Icon(Icons.place_outlined), label: 'Places'),
-        const NavigationDestination(icon: Icon(Icons.event_available_outlined), label: 'Sessions'),
+        const NavigationDestination(icon: Icon(Icons.event_available_outlined), label: 'Trainers'),
         const NavigationDestination(icon: Icon(Icons.favorite_outline), label: 'Wishlist'),
         if (showAdmin)
           const NavigationDestination(
@@ -37,7 +37,7 @@ class MatrixNavBar extends ConsumerWidget {
 
   int _indexForRoute(String route, {required bool showAdmin}) {
     if (route.startsWith('/places')) return 1;
-    if (route.startsWith('/sessions')) return 2;
+    if (route.startsWith('/trainers')) return 2;
     if (route.startsWith('/wishlist')) return 3;
     if (showAdmin && route.startsWith('/admin')) return 4;
     if (route.startsWith('/profile') || route.startsWith('/bookings')) {
@@ -50,7 +50,7 @@ class MatrixNavBar extends ConsumerWidget {
     final destinations = <String>[
       '/home',
       '/places',
-      '/sessions',
+      '/trainers',
       '/wishlist',
       if (showAdmin) '/admin',
       '/profile',

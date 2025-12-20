@@ -11,6 +11,9 @@ class MatrixButton extends StatelessWidget {
     this.variant = MatrixButtonVariant.filled,
     this.icon,
     this.expand = false,
+    this.padding,
+    this.height,
+    this.dense = false,
   });
 
   final String label;
@@ -18,10 +21,14 @@ class MatrixButton extends StatelessWidget {
   final MatrixButtonVariant variant;
   final IconData? icon;
   final bool expand;
+  final EdgeInsetsGeometry? padding;
+  final double? height;
+  final bool dense;
 
   @override
   Widget build(BuildContext context) {
     final colors = _resolveColors();
+
     final child = Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -36,40 +43,55 @@ class MatrixButton extends StatelessWidget {
             fontWeight: FontWeight.w700,
             letterSpacing: 0.3,
             color: colors.foreground,
+            fontSize: dense ? 12.5 : null, 
           ),
         ),
       ],
     );
 
+    final resolvedPadding = padding ??
+        (dense
+            ? const EdgeInsets.symmetric(horizontal: 16, vertical: 10) // ✅ lebih kecil
+            : const EdgeInsets.symmetric(horizontal: 18, vertical: 14));
+
     final button = AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-      decoration: BoxDecoration(
-        gradient: colors.gradient,
-        color: colors.background,
+    duration: const Duration(milliseconds: 180),
+    padding: EdgeInsets.symmetric(
+      horizontal: dense ? 16 : 18,
+      vertical: dense ? 10 : 14, 
+    ),
+    decoration: BoxDecoration(
+      gradient: colors.gradient,
+      color: colors.background,
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(color: colors.border, width: 1.2),
+      boxShadow: variant == MatrixButtonVariant.ghost
+          ? const [] 
+          : [
+              BoxShadow(
+                color: MatrixColors.primary.withAlpha(36),
+                blurRadius: 16,
+                offset: const Offset(0, 10),
+              ),
+            ],
+    ),
+    child: child,
+  );
+
+
+    final ink = Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: colors.border, width: 1.2),
-        boxShadow: [
-          BoxShadow(
-            color: MatrixColors.primary.withAlpha(36),
-            blurRadius: 16,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        child: button,
       ),
-      child: child,
     );
 
     return SizedBox(
       width: expand ? double.infinity : null,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(18),
-          child: button,
-        ),
-      ),
+      height: height, 
+      child: ink,
     );
   }
 
@@ -98,6 +120,7 @@ class MatrixButton extends StatelessWidget {
     }
   }
 }
+
 
 enum MatrixButtonVariant { filled, ghost, danger }
 

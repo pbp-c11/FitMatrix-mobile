@@ -202,58 +202,64 @@ class AdminPlacesScreen extends ConsumerWidget {
                               ),
                             ],
                             onSelected: (action) async {
-                              final api = ref.read(apiServiceProvider);
-                              final messenger = ScaffoldMessenger.of(context);
-                              final router = GoRouter.of(context);
+                            final api = ref.read(apiServiceProvider);
 
-                              if (action == _PlaceAction.view) {
-                                router.go('/places/${place.slug}');
-                                return;
-                              }
+                            if (action == _PlaceAction.view) {
+                              if (!context.mounted) return;
+                              context.go('/places/${place.slug}');
+                              return;
+                            }
 
-                              if (action == _PlaceAction.toggleActive) {
-                                try {
-                                  await api.togglePlaceActive(place.slug);
-                                  ref.invalidate(adminPlacesProvider);
-                                } catch (err) {
-                                  messenger.showSnackBar(
-                                    SnackBar(content: Text('Failed to update place: $err')),
-                                  );
-                                }
-                                return;
-                              }
-
-                              final confirm = await showDialog<bool>(
-                                context: context,
-                                builder: (_) => AlertDialog(
-                                  title: const Text('Delete place?'),
-                                  content: Text('Delete "${place.name}" permanently?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.of(context).pop(false),
-                                      child: const Text('Cancel'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () => Navigator.of(context).pop(true),
-                                      child: const Text('Delete'),
-                                    ),
-                                  ],
-                                ),
-                              );
-                              if (confirm != true) return;
-
+                            if (action == _PlaceAction.toggleActive) {
                               try {
-                                await api.deletePlace(place.slug);
+                                await api.togglePlaceActive(place.slug);
                                 ref.invalidate(adminPlacesProvider);
-                                messenger.showSnackBar(
-                                  const SnackBar(content: Text('Place deleted')),
-                                );
                               } catch (err) {
-                                messenger.showSnackBar(
-                                  SnackBar(content: Text('Failed to delete place: $err')),
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Failed to update place: $err')),
                                 );
                               }
-                            },
+                              return;
+                            }
+
+                            // DELETE
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (dialogContext) => AlertDialog(
+                                title: const Text('Delete place?'),
+                                content: Text('Delete "${place.name}" permanently?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(dialogContext).pop(false),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.of(dialogContext).pop(true),
+                                    child: const Text('Delete'),
+                                  ),
+                                ],
+                              ),
+                            );
+
+                            if (confirm != true) return;
+
+                            try {
+                              await api.deletePlace(place.slug);
+                              ref.invalidate(adminPlacesProvider);
+
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Place deleted')),
+                              );
+                            } catch (err) {
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Failed to delete place: $err')),
+                              );
+                            }
+                          },
+
                           ),
                         ],
                       ),
