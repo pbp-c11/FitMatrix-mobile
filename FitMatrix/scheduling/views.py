@@ -19,7 +19,15 @@ def trainer_list(request: HttpRequest) -> HttpResponse:
     query = request.GET.get("q", "").strip()
     focus = request.GET.get("focus", "").strip()
 
-    trainers = Trainer.objects.filter(is_active=True)
+    trainers = Trainer.objects.select_related("place").filter(is_active=True)
+    
+    # Filter by date availability
+    today = timezone.now().date()
+    trainers = trainers.filter(
+        Q(start_date__isnull=True) | Q(start_date__lte=today),
+        Q(end_date__isnull=True) | Q(end_date__gte=today),
+    )
+    
     if query:
         trainers = trainers.filter(Q(name__icontains=query) | Q(specialties__icontains=query))
     if focus:

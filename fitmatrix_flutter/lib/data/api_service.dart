@@ -87,7 +87,7 @@ class ApiService {
   }
 
   Future<void> deletePlace(String slug) async {
-    await _dio.delete('places/$slug/');
+    await _dio.post('places/$slug/delete/');
   }
 
   Future<List<Trainer>> fetchTrainers({String? query, String? focus}) async {

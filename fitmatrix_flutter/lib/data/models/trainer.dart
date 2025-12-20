@@ -1,3 +1,24 @@
+class TrainerPlace {
+  final int id;
+  final String name;
+  final String slug;
+  final String city;
+
+  const TrainerPlace({
+    required this.id,
+    required this.name,
+    required this.slug,
+    required this.city,
+  });
+
+  factory TrainerPlace.fromJson(Map<String, dynamic> json) => TrainerPlace(
+        id: int.tryParse('${json['id']}') ?? 0,
+        name: json['name'] as String? ?? '',
+        slug: json['slug'] as String? ?? '',
+        city: json['city'] as String? ?? '',
+      );
+}
+
 class Trainer {
   final int id;
   final String name;
@@ -7,9 +28,13 @@ class Trainer {
   final int likes;
   final double ratingAvg;
   final bool isActive;
-  final String? calendlyUrl;
   final DateTime? nextAvailable;
   final int activeSlots;
+  // New scheduling fields
+  final TrainerPlace? place;
+  final DateTime? startDate;
+  final DateTime? endDate;
+  final bool isAvailable;
 
   const Trainer({
     required this.id,
@@ -20,9 +45,12 @@ class Trainer {
     required this.ratingAvg,
     required this.isActive,
     this.bio,
-    this.calendlyUrl,
     this.nextAvailable,
     this.activeSlots = 0,
+    this.place,
+    this.startDate,
+    this.endDate,
+    this.isAvailable = true,
   });
 
   factory Trainer.fromJson(Map<String, dynamic> json) => Trainer(
@@ -34,11 +62,20 @@ class Trainer {
         likes: int.tryParse('${json['likes'] ?? 0}') ?? 0,
         ratingAvg: _toDouble(json['rating_avg']),
         isActive: json['is_active'] as bool? ?? true,
-        calendlyUrl: json['calendly_url'] as String?,
         nextAvailable: json['next_available'] != null
             ? DateTime.tryParse(json['next_available'].toString())
             : null,
         activeSlots: int.tryParse('${json['active_slots'] ?? 0}') ?? 0,
+        place: json['place'] != null
+            ? TrainerPlace.fromJson(json['place'] as Map<String, dynamic>)
+            : null,
+        startDate: json['start_date'] != null
+            ? DateTime.tryParse(json['start_date'].toString())
+            : null,
+        endDate: json['end_date'] != null
+            ? DateTime.tryParse(json['end_date'].toString())
+            : null,
+        isAvailable: json['is_available'] as bool? ?? true,
       );
 
   static double _toDouble(Object? value) {

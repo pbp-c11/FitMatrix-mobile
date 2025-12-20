@@ -602,7 +602,7 @@ class _PlaceReviewsState extends ConsumerState<_PlaceReviews> {
             const SizedBox(height: 8),
             DropdownButtonFormField<int>(
               key: ValueKey(_rating),
-              initialValue: _rating,
+              value: _rating,
               items: List.generate(5, (index) => index + 1)
                   .map((value) => DropdownMenuItem(value: value, child: Text('$value')))
                   .toList(),

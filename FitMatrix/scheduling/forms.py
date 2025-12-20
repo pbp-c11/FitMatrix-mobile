@@ -33,9 +33,9 @@ class TrainerForm(forms.ModelForm):
             "specialties",
             "bio",
             "price_per_session",
-            "likes",
-            "calendly_url",
-            "rating_avg",
+            "place",
+            "start_date",
+            "end_date",
             "is_active",
         )
         widgets = {
@@ -45,11 +45,9 @@ class TrainerForm(forms.ModelForm):
             "price_per_session": forms.NumberInput(
                 attrs={"class": "input", "min": "0", "step": "0.01"}
             ),
-            "likes": forms.NumberInput(attrs={"class": "input", "min": "0"}),
-            "calendly_url": forms.URLInput(attrs={"class": "input"}),
-            "rating_avg": forms.NumberInput(
-                attrs={"class": "input", "min": "0", "max": "5", "step": "0.1"}
-            ),
+            "place": forms.Select(attrs={"class": "input"}),
+            "start_date": forms.DateInput(attrs={"class": "input", "type": "date"}),
+            "end_date": forms.DateInput(attrs={"class": "input", "type": "date"}),
             "is_active": forms.CheckboxInput(attrs={"class": "input-toggle"}),
         }
 

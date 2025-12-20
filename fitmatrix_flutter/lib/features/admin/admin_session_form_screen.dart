@@ -158,26 +158,36 @@ class _AdminSessionFormScreenState extends ConsumerState<AdminSessionFormScreen>
                   Text('Assignment', style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 10),
                   DropdownButtonFormField<int>(
-                    initialValue: trainerValue,
+                    value: trainerValue,
                     decoration: const InputDecoration(labelText: 'Trainer'),
+                    isExpanded: true,
                     items: [
                       for (final trainer in trainers)
                         DropdownMenuItem(
                           value: trainer.id,
-                          child: Text(trainer.name),
+                          child: Text(
+                            trainer.name,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
                         ),
                     ],
                     onChanged: (value) => setState(() => _trainerId = value),
                   ),
                   const SizedBox(height: 10),
                   DropdownButtonFormField<int>(
-                    initialValue: placeValue,
+                    value: placeValue,
                     decoration: const InputDecoration(labelText: 'Place'),
+                    isExpanded: true,
                     items: [
                       for (final place in places)
                         DropdownMenuItem(
                           value: place.id,
-                          child: Text('${place.name} • ${place.city}'),
+                          child: Text(
+                            '${place.name} • ${place.city}',
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
                         ),
                     ],
                     onChanged: (value) => setState(() => _placeId = value),

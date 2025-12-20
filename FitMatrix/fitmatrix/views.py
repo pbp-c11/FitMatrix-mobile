@@ -1,13 +1,24 @@
 from django.shortcuts import render
-from django.db.models import Count, Avg
+from django.db.models import Count, Avg, Q
+from django.utils import timezone
 from places.models import Place
+from scheduling.models import Trainer
 
 def home_view(request):
-    # Ringkas: summary (boleh tetap punyamu)
+    today = timezone.now().date()
+    
+    # Count active trainers with proper date filtering
+    trainer_count = Trainer.objects.filter(
+        is_active=True
+    ).filter(
+        Q(start_date__isnull=True) | Q(start_date__lte=today),
+        Q(end_date__isnull=True) | Q(end_date__gte=today),
+    ).count()
+    
     summary = {
         "place_count": Place.objects.filter(is_active=True).count(),
         "studio_count": Place.objects.filter(is_active=True, facility_type=Place.FacilityType.STUDIO).count(),
-        "trainer_count": Place.objects.filter(is_active=True, facility_type__in=[Place.FacilityType.GYM, Place.FacilityType.STUDIO]).count(),
+        "trainer_count": trainer_count,
     }
 
     # === TRENDING: rating terbanyak & tinggi; minimal 10 ulasan ===

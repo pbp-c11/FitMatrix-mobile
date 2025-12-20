@@ -183,6 +183,26 @@ class AdminTrainersScreen extends ConsumerWidget {
                                       .bodySmall
                                       ?.copyWith(color: MatrixColors.muted),
                                 ),
+                                if (trainer.place != null) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Place: ${trainer.place!.name}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(color: MatrixColors.mint),
+                                  ),
+                                ],
+                                if (trainer.startDate != null || trainer.endDate != null) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Schedule: ${trainer.startDate?.toLocal().toString().substring(0, 10) ?? 'Start'} - ${trainer.endDate?.toLocal().toString().substring(0, 10) ?? 'Ongoing'}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(color: MatrixColors.muted),
+                                  ),
+                                ],
                               ],
                             ),
                           ),

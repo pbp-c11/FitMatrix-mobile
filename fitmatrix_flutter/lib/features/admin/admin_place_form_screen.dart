@@ -177,8 +177,9 @@ class _AdminPlaceFormScreenState extends ConsumerState<AdminPlaceFormScreen> {
                 ),
                 const SizedBox(height: 10),
                 DropdownButtonFormField<String>(
-                  initialValue: _facilityType,
+                  value: _facilityType,
                   decoration: const InputDecoration(labelText: 'Facility type'),
+                  isExpanded: true,
                   items: const [
                     DropdownMenuItem(value: 'GYM', child: Text('Gym')),
                     DropdownMenuItem(value: 'STUDIO', child: Text('Studio')),

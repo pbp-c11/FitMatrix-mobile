@@ -212,6 +212,12 @@ class PlaceViewSet(viewsets.ModelViewSet):
         place.save(update_fields=["is_active"])
         return Response({"is_active": place.is_active})
 
+    @action(detail=True, methods=["post"], permission_classes=[permissions.IsAdminUser], url_path="delete")
+    def delete_place(self, request, slug=None):
+        """Explicit delete endpoint for mobile compatibility."""
+        place = self.get_object()
+        place.delete()
+        return Response({"success": True}, status=status.HTTP_200_OK)
 
 class TrainerViewSet(viewsets.ModelViewSet):
     serializer_class = TrainerSerializer
@@ -224,9 +230,16 @@ class TrainerViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         query = self.request.query_params.get("q", "").strip()
         focus = self.request.query_params.get("focus", "").strip()
-        qs = Trainer.objects.all()
-        if not (self.request.user.is_staff or getattr(self.request.user, "is_admin", False)):
+        qs = Trainer.objects.select_related("place").all()
+        is_admin_user = self.request.user.is_staff or getattr(self.request.user, "is_admin", False)
+        if not is_admin_user:
             qs = qs.filter(is_active=True)
+            # Filter by date availability for non-admin users
+            today = timezone.now().date()
+            qs = qs.filter(
+                Q(start_date__isnull=True) | Q(start_date__lte=today),
+                Q(end_date__isnull=True) | Q(end_date__gte=today),
+            )
         if query:
             qs = qs.filter(Q(name__icontains=query) | Q(specialties__icontains=query))
         if focus:

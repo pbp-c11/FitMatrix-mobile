@@ -188,6 +188,15 @@ class TrainerSummarySerializer(serializers.ModelSerializer):
 class TrainerSerializer(serializers.ModelSerializer):
     next_available = serializers.DateTimeField(read_only=True)
     active_slots = serializers.IntegerField(read_only=True)
+    is_available = serializers.BooleanField(read_only=True)
+    place = PlaceSummarySerializer(read_only=True)
+    place_id = serializers.PrimaryKeyRelatedField(
+        source="place",
+        queryset=Place.objects.all(),
+        write_only=True,
+        required=False,
+        allow_null=True,
+    )
 
     class Meta:
         model = Trainer
@@ -198,11 +207,15 @@ class TrainerSerializer(serializers.ModelSerializer):
             "bio",
             "price_per_session",
             "likes",
-            "calendly_url",
             "rating_avg",
             "is_active",
             "next_available",
             "active_slots",
+            "place",
+            "place_id",
+            "start_date",
+            "end_date",
+            "is_available",
         ]
 
 

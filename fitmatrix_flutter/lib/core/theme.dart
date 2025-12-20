@@ -98,6 +98,31 @@ ThemeData buildMatrixTheme() {
         textStyle: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, letterSpacing: 0.2),
       ),
     ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        foregroundColor: MatrixColors.ink,
+        side: const BorderSide(color: MatrixColors.border),
+        textStyle: GoogleFonts.spaceGrotesk(fontWeight: FontWeight.w700, letterSpacing: 0.4),
+      ),
+    ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: MatrixColors.card,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 8,
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: MatrixColors.card,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      elevation: 8,
+    ),
+    bottomSheetTheme: const BottomSheetThemeData(
+      backgroundColor: MatrixColors.card,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+    ),
   );
 }
 

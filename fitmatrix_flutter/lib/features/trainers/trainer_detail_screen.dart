@@ -72,25 +72,22 @@ class _TrainerBody extends ConsumerWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(trainer.bio ?? trainer.specialties),
+                if (trainer.place != null) ...[
+                  const SizedBox(height: 10),
+                  Chip(
+                    label: Text('@ ${trainer.place!.name}'),
+                    backgroundColor: MatrixColors.mint.withAlpha(102),
+                  ),
+                ],
                 const SizedBox(height: 12),
-                Row(
-                  children: [
-                    MatrixButton(
-                      label: 'Save trainer',
-                      variant: MatrixButtonVariant.ghost,
-                      onPressed: () {
-                        ref.read(apiServiceProvider).toggleWishlist('trainer', trainer.id);
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(const SnackBar(content: Text('Trainer saved')));
-                      },
-                    ),
-                    const SizedBox(width: 10),
-                    if (trainer.calendlyUrl != null)
-                      MatrixButton(
-                        label: 'Calendly',
-                        onPressed: () {},
-                      ),
-                  ],
+                MatrixButton(
+                  label: 'Save trainer',
+                  variant: MatrixButtonVariant.ghost,
+                  onPressed: () {
+                    ref.read(apiServiceProvider).toggleWishlist('trainer', trainer.id);
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(const SnackBar(content: Text('Trainer saved')));
+                  },
                 ),
               ],
             ),

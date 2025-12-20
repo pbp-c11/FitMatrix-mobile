@@ -59,6 +59,12 @@
             <span class="matrix-pill">Rp {{ trainer.price_per_session|floatformat:0 }} / session</span>
             <span class="matrix-pill">{{ trainer.likes }} likes</span>
             <span class="matrix-pill">Rating {{ trainer.rating_avg|floatformat:1 }}</span>
+            {% if trainer.place %}
+              <span class="matrix-pill">@ {{ trainer.place.name }}</span>
+            {% endif %}
+            {% if trainer.end_date %}
+              <span class="matrix-pill">Until {{ trainer.end_date|date:"M d, Y" }}</span>
+            {% endif %}
             {% if trainer.next_available %}
               <span class="matrix-pill">Next {{ trainer.next_available|date:"M d, H:i" }}</span>
             {% endif %}

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../core/theme.dart';
 import '../../data/api_service.dart';
 import '../../data/auth_controller.dart';
+import '../../data/models/place.dart';
 import '../../data/models/trainer.dart';
 import '../../widgets/matrix_button.dart';
 import '../../widgets/matrix_card.dart';
@@ -14,6 +16,11 @@ import 'admin_trainers_screen.dart';
 final adminTrainerDetailProvider =
     FutureProvider.autoDispose.family<Trainer, int>((ref, id) {
   return ref.read(apiServiceProvider).fetchTrainerDetail(id);
+});
+
+final adminPlacesForTrainerProvider =
+    FutureProvider.autoDispose<List<Place>>((ref) {
+  return ref.read(apiServiceProvider).fetchPlaces();
 });
 
 class AdminTrainerFormScreen extends ConsumerStatefulWidget {
@@ -35,10 +42,14 @@ class _AdminTrainerFormScreenState extends ConsumerState<AdminTrainerFormScreen>
   final _specialties = TextEditingController();
   final _bio = TextEditingController();
   final _price = TextEditingController();
-  final _calendly = TextEditingController();
   bool _isActive = true;
   bool _saving = false;
   bool _initialized = false;
+
+  // New scheduling fields
+  int? _selectedPlaceId;
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   @override
   void dispose() {
@@ -46,7 +57,6 @@ class _AdminTrainerFormScreenState extends ConsumerState<AdminTrainerFormScreen>
     _specialties.dispose();
     _bio.dispose();
     _price.dispose();
-    _calendly.dispose();
     super.dispose();
   }
 
@@ -55,8 +65,10 @@ class _AdminTrainerFormScreenState extends ConsumerState<AdminTrainerFormScreen>
     _specialties.text = trainer.specialties;
     _bio.text = trainer.bio ?? '';
     _price.text = trainer.pricePerSession.toString();
-    _calendly.text = trainer.calendlyUrl ?? '';
     _isActive = trainer.isActive;
+    _selectedPlaceId = trainer.place?.id;
+    _startDate = trainer.startDate;
+    _endDate = trainer.endDate;
     _initialized = true;
   }
 
@@ -87,6 +99,9 @@ class _AdminTrainerFormScreenState extends ConsumerState<AdminTrainerFormScreen>
   }
 
   Widget _buildForm(BuildContext context, {int? id}) {
+    final placesAsync = ref.watch(adminPlacesForTrainerProvider);
+    final dateFormat = DateFormat('yyyy-MM-dd');
+
     return Form(
       key: _formKey,
       child: ListView(
@@ -152,7 +167,7 @@ class _AdminTrainerFormScreenState extends ConsumerState<AdminTrainerFormScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Pricing & status', style: Theme.of(context).textTheme.titleLarge),
+                Text('Pricing & Status', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _price,
@@ -160,17 +175,116 @@ class _AdminTrainerFormScreenState extends ConsumerState<AdminTrainerFormScreen>
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 ),
                 const SizedBox(height: 10),
-                TextFormField(
-                  controller: _calendly,
-                  decoration: const InputDecoration(labelText: 'Calendly URL (optional)'),
-                  keyboardType: TextInputType.url,
-                ),
-                const SizedBox(height: 10),
                 SwitchListTile(
                   value: _isActive,
                   contentPadding: EdgeInsets.zero,
                   title: const Text('Active'),
                   onChanged: (value) => setState(() => _isActive = value),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          MatrixCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Scheduling', style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 10),
+                placesAsync.when(
+                  loading: () => const CircularProgressIndicator(),
+                  error: (err, _) => Text('Failed to load places: $err'),
+                  data: (places) => DropdownButtonFormField<int?>(
+                    decoration: const InputDecoration(labelText: 'Assigned Place'),
+                    isExpanded: true,
+                    items: [
+                      const DropdownMenuItem<int?>(
+                        value: null,
+                        child: Text('No place assigned'),
+                      ),
+                      ...places.map((p) => DropdownMenuItem<int?>(
+                            value: p.id,
+                            child: Text(
+                              '${p.name} - ${p.city}',
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          )),
+                    ],
+                    onChanged: (value) => setState(() => _selectedPlaceId = value),
+                    value: _selectedPlaceId,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: _startDate ?? DateTime.now(),
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime(2100),
+                          );
+                          if (picked != null) {
+                            setState(() => _startDate = picked);
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: const InputDecoration(labelText: 'Start Date'),
+                          child: Text(
+                            _startDate != null ? dateFormat.format(_startDate!) : 'Not set',
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    if (_startDate != null)
+                      IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () => setState(() => _startDate = null),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () async {
+                          final picked = await showDatePicker(
+                            context: context,
+                            initialDate: _endDate ?? DateTime.now(),
+                            firstDate: DateTime(2020),
+                            lastDate: DateTime(2100),
+                          );
+                          if (picked != null) {
+                            setState(() => _endDate = picked);
+                          }
+                        },
+                        child: InputDecorator(
+                          decoration: const InputDecoration(labelText: 'End Date'),
+                          child: Text(
+                            _endDate != null ? dateFormat.format(_endDate!) : 'Not set',
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    if (_endDate != null)
+                      IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () => setState(() => _endDate = null),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Trainer will be hidden from users after the end date.',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: MatrixColors.muted,
+                      ),
                 ),
               ],
             ),
@@ -186,6 +300,11 @@ class _AdminTrainerFormScreenState extends ConsumerState<AdminTrainerFormScreen>
     return double.tryParse(v) ?? fallback;
   }
 
+  String? _formatDate(DateTime? date) {
+    if (date == null) return null;
+    return DateFormat('yyyy-MM-dd').format(date);
+  }
+
   Future<void> _save(BuildContext context, {int? id}) async {
     if (_saving) return;
     if (!_formKey.currentState!.validate()) return;
@@ -197,8 +316,10 @@ class _AdminTrainerFormScreenState extends ConsumerState<AdminTrainerFormScreen>
       'specialties': _specialties.text.trim(),
       'bio': _bio.text.trim(),
       'price_per_session': _parseDouble(_price.text, fallback: 0),
-      'calendly_url': _calendly.text.trim(),
       'is_active': _isActive,
+      'place_id': _selectedPlaceId,
+      'start_date': _formatDate(_startDate),
+      'end_date': _formatDate(_endDate),
     };
 
     try {
@@ -224,4 +345,3 @@ class _AdminTrainerFormScreenState extends ConsumerState<AdminTrainerFormScreen>
     }
   }
 }
-

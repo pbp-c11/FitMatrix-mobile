@@ -107,6 +107,11 @@ class TrainerListScreen extends ConsumerWidget {
                           children: [
                             Chip(label: Text('${trainer.likes} likes')),
                             Chip(label: Text('${trainer.ratingAvg.toStringAsFixed(1)} ★')),
+                            if (trainer.place != null)
+                              Chip(
+                                label: Text(trainer.place!.name),
+                                backgroundColor: MatrixColors.mint.withAlpha(80),
+                              ),
                             if (trainer.nextAvailable != null)
                               Chip(
                                 label: Text(

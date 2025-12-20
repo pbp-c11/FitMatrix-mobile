@@ -17,9 +17,31 @@ class Trainer(models.Model):
     calendly_url = models.URLField(blank=True)
     rating_avg = models.FloatField(default=0)
     is_active = models.BooleanField(default=True)
+    # Scheduling fields
+    place = models.ForeignKey(
+        "places.Place",
+        related_name="trainers",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
 
     class Meta:
         ordering = ["name"]
+
+    @property
+    def is_available(self) -> bool:
+        """Check if trainer is available based on start/end dates."""
+        if not self.is_active:
+            return False
+        today = timezone.now().date()
+        if self.start_date and today < self.start_date:
+            return False
+        if self.end_date and today > self.end_date:
+            return False
+        return True
 
     def __str__(self) -> str:
         return self.name

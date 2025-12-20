@@ -102,17 +102,36 @@ class Command(BaseCommand):
             ("Fajar Wibowo", "Calisthenics"),
             ("Lia Kartika", "Mobility"),
         ]
+        
+        places = list(Place.objects.all())
+        if not places:
+            self.stdout.write(self.style.WARNING("No places found! Run injector.py first."))
+            return
+        
+        today = timezone.now().date()
         trainers = []
-        for name, specialties in trainers_info:
-            trainer, _ = Trainer.objects.get_or_create(
+        for i, (name, specialties) in enumerate(trainers_info):
+            # Assign a place to each trainer (cycle through available places)
+            assigned_place = places[i % len(places)] if places else None
+            
+            trainer, created = Trainer.objects.update_or_create(
                 name=name,
-                defaults={"specialties": specialties, "bio": f"Certified in {specialties}."},
+                defaults={
+                    "specialties": specialties,
+                    "bio": f"Certified professional trainer specializing in {specialties}.",
+                    "price_per_session": Decimal(str(random.randint(150, 400) * 1000)),
+                    "is_active": True,
+                    "place": assigned_place,
+                    "start_date": today,
+                    "end_date": today + timedelta(days=90),  # Available for 3 months
+                },
             )
             trainers.append(trainer)
-        self.stdout.write("- Trainers prepared")
-
-        places = list(Place.objects.all())  # atau kosongkan total: places = []
-        self.stdout.write(f"- Skipped place seeding (manual-only mode)")
+            status = "created" if created else "updated"
+            self.stdout.write(f"  - Trainer {name} {status} @ {assigned_place}")
+        
+        self.stdout.write(f"- Trainers prepared ({len(trainers)} total)")
+        self.stdout.write(f"- Using {len(places)} existing places")
 
 
         # ---- Session slots ---------------------------------------------------
