@@ -1,3 +1,4 @@
+import 'package:fitmatrix_flutter/data/models/booking.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +19,10 @@ final trainerDetailProvider = FutureProvider.family<Trainer, int>((ref, id) {
 final trainerSlotsProvider =
     FutureProvider.family<List<SessionSlot>, int>((ref, id) {
   return ref.read(apiServiceProvider).fetchTrainerSlots(id);
+});
+
+final bookingsProvider = FutureProvider<List<Booking>>((ref) {
+  return ref.read(apiServiceProvider).fetchBookings();
 });
 
 class TrainerDetailScreen extends ConsumerWidget {
@@ -101,23 +106,7 @@ class _TrainerBody extends ConsumerWidget {
                     const SizedBox(height: 12),
                     Text(trainer.bio ?? trainer.specialties),
 
-                    const SizedBox(height: 16),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: MatrixButton(
-                        label: 'Save trainer',
-                        variant: MatrixButtonVariant.ghost,
-                        onPressed: () {
-                          ref
-                              .read(apiServiceProvider)
-                              .toggleWishlist('trainer', trainer.id);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Trainer saved')),
-                          );
-                        },
-                      ),
-                    ),
+                  
                   ],
                 ),
               ),
@@ -185,20 +174,19 @@ class _TrainerBody extends ConsumerWidget {
                                   width: 120,
                                   child: MatrixButton(
                                     label: 'Book',
-                                    variant:
-                                        MatrixButtonVariant.ghost,
-                                    onPressed:
-                                        auth.state.isAuthenticated
-                                            ? () => _book(
-                                                context, ref, slot.id)
-                                            : () =>
-                                                ScaffoldMessenger.of(
-                                                        context)
-                                                    .showSnackBar(
-                                                const SnackBar(
-                                                    content: Text(
-                                                        'Login to book a session')),
+                                    variant: MatrixButtonVariant.ghost,
+                                    onPressed: auth.state.isAuthenticated
+                                        ? () async {
+                                            await _book(context, ref, slot.id);
+                                            ref.invalidate(trainerDetailProvider);
+                                            ref.invalidate(trainerSlotsProvider);
+                                            ref.invalidate(bookingsProvider);
+                                          }
+                                        : () => ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(
+                                                content: Text('Login to book a session'),
                                               ),
+                                            ),
                                   ),
                                 ),
                               ],

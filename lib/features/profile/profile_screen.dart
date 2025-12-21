@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:fitmatrix_flutter/features/bookings/bookings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -119,7 +120,13 @@ class ProfileScreen extends ConsumerWidget {
                     MatrixButton(
                       label: 'My bookings',
                       variant: MatrixButtonVariant.ghost,
-                      onPressed: () => context.go('/bookings'),
+                      onPressed: () {
+                        // 🔄 invalidate provider sebelum navigasi
+                        ref.invalidate(bookingsProvider);
+
+                        // navigasi ke bookings screen
+                        context.go('/bookings');
+                      },
                     ),
                     MatrixButton(
                       label: 'Wishlist',

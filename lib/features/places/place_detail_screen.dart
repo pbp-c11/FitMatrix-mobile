@@ -1,3 +1,4 @@
+import 'package:fitmatrix_flutter/features/wishlist/wishlist_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -261,9 +262,16 @@ class _PlaceDetailBody extends ConsumerWidget {
                               label: 'Add to wishlist',
                               variant: MatrixButtonVariant.ghost,
                               onPressed: auth.state.isAuthenticated
-                                  ? () => _openCollectionSheet(context, ref)
+                                  ? () async {
+                                      _openCollectionSheet(context, ref);
+
+                                      // 🔄 invalidate wishlist setiap kali ditekan
+                                      ref.invalidate(wishlistProvider);
+                                    }
                                   : () => ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Login to save this place')),
+                                        const SnackBar(
+                                          content: Text('Login to save this place'),
+                                        ),
                                       ),
                             ),
                           ),
@@ -275,7 +283,7 @@ class _PlaceDetailBody extends ConsumerWidget {
                             ),
                           ),
                         ],
-                      ),
+                      )
                     ],
                   ),
                 ),

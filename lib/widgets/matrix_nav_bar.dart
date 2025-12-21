@@ -1,3 +1,9 @@
+import 'package:fitmatrix_flutter/data/providers/collections_provider.dart';
+import 'package:fitmatrix_flutter/features/home/home_screen.dart';
+import 'package:fitmatrix_flutter/features/places/place_list_screen.dart';
+import 'package:fitmatrix_flutter/features/trainers/trainer_detail_screen.dart';
+import 'package:fitmatrix_flutter/features/trainers/trainer_list_screen.dart';
+import 'package:fitmatrix_flutter/features/wishlist/wishlist_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -31,7 +37,35 @@ class MatrixNavBar extends ConsumerWidget {
         const NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
       ],
       selectedIndex: index,
-      onDestinationSelected: (value) => _onTap(context, value, showAdmin: showAdmin),
+      onDestinationSelected: (index) {
+        final destinations = <String>[
+          '/home',
+          '/places',
+          '/trainers',
+          '/wishlist',
+          if (showAdmin) '/admin',
+          '/profile',
+        ];
+
+        if (index < 0 || index >= destinations.length) return;
+
+        final target = destinations[index];
+
+        if (target == '/home') {
+          ref.invalidate(homeProvider);
+        } else if (target == '/places') {
+          ref.invalidate(placeListProvider);
+          ref.invalidate(placeFiltersProvider);
+        } else if (target == '/trainers') {
+          ref.invalidate(trainersProvider);
+          ref.invalidate(trainerSlotsProvider);
+          ref.invalidate(trainerDetailProvider);
+          ref.invalidate(trainerQueryProvider);
+        } else if (target == '/wishlist') {
+          ref.invalidate(collectionsProvider);
+        }
+        context.go(target);
+      },
     );
   }
 
@@ -46,16 +80,16 @@ class MatrixNavBar extends ConsumerWidget {
     return 0;
   }
 
-  void _onTap(BuildContext context, int index, {required bool showAdmin}) {
-    final destinations = <String>[
-      '/home',
-      '/places',
-      '/trainers',
-      '/wishlist',
-      if (showAdmin) '/admin',
-      '/profile',
-    ];
-    if (index < 0 || index >= destinations.length) return;
-    context.go(destinations[index]);
-  }
+  // void _onTap(BuildContext context, int index, {required bool showAdmin}) {
+  //   final destinations = <String>[
+  //     '/home',
+  //     '/places',
+  //     '/trainers',
+  //     '/wishlist',
+  //     if (showAdmin) '/admin',
+  //     '/profile',
+  //   ];
+  //   if (index < 0 || index >= destinations.length) return;
+  //   context.go(destinations[index]);
+  // }
 }
