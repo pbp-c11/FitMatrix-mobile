@@ -11,7 +11,7 @@ class PlaceQuerySet(models.QuerySet):
         return self.filter(is_active=True)
 
     def recommendable(self):
-        return self.active().filter(highlight_score__gte=1)
+        return self.active()
 
     def by_type(self, facility_type: str | None):
         if not facility_type or facility_type.lower() in {"", "all"}:
