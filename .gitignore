@@ -1,56 +1,43 @@
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-Thumbs.db
-Desktop.ini
-.atom/
-.build/
-.buildlog/
-.history
-.svn/
-.swiftpm/
-migrate_working_dir/
-
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# VS Code related
-.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
-/build/
-/coverage/
-
-# Symbolication related
-app.*.symbols
-
-# Obfuscation related
-app.*.map.json
-
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
-
-# FVM (Flutter Version Management)
-.fvm/
-
 # Codex / AI assistant artifacts
 .codex/
 .codex-cli/
 .openai/
 *.codex.log
+
+# Python virtual environments
+venv/
+.venv/
+
+# Django / Python caches
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+coverage.xml
+
+# Node / tooling
+node_modules/
+
+# IDE / editor
+.idea/
+.vscode/
+*.iml
+
+# OS junk
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Flutter / Android / iOS build output
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+**/pubspec.lock
+
+# Ignore Dhea mobile + backend tree (only commit Kalfin version)
+FitMAtrix-mobile-dhea/
+

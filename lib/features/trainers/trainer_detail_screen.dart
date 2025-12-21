@@ -11,12 +11,13 @@ import '../../widgets/matrix_button.dart';
 import '../../widgets/matrix_card.dart';
 import '../../widgets/matrix_scaffold.dart';
 
-final trainerDetailProvider = FutureProvider.family<Trainer, int>((ref, id) {
+final trainerDetailProvider =
+    FutureProvider.autoDispose.family<Trainer, int>((ref, id) {
   return ref.read(apiServiceProvider).fetchTrainerDetail(id);
 });
 
 final trainerSlotsProvider =
-    FutureProvider.family<List<SessionSlot>, int>((ref, id) {
+    FutureProvider.autoDispose.family<List<SessionSlot>, int>((ref, id) {
   return ref.read(apiServiceProvider).fetchTrainerSlots(id);
 });
 
@@ -184,21 +185,22 @@ class _TrainerBody extends ConsumerWidget {
                                 SizedBox(
                                   width: 120,
                                   child: MatrixButton(
-                                    label: 'Book',
-                                    variant:
-                                        MatrixButtonVariant.ghost,
-                                    onPressed:
-                                        auth.state.isAuthenticated
+                                    label:
+                                        slot.seatsLeft > 0 ? 'Book' : 'Full',
+                                    variant: MatrixButtonVariant.ghost,
+                                    onPressed: slot.seatsLeft > 0
+                                        ? (auth.state.isAuthenticated
                                             ? () => _book(
                                                 context, ref, slot.id)
-                                            : () =>
-                                                ScaffoldMessenger.of(
-                                                        context)
+                                            : () => ScaffoldMessenger.of(context)
                                                     .showSnackBar(
-                                                const SnackBar(
+                                                  const SnackBar(
                                                     content: Text(
-                                                        'Login to book a session')),
-                                              ),
+                                                      'Login to book a session',
+                                                    ),
+                                                  ),
+                                                ))
+                                        : null,
                                   ),
                                 ),
                               ],
@@ -219,10 +221,18 @@ class _TrainerBody extends ConsumerWidget {
 
   Future<void> _book(
       BuildContext context, WidgetRef ref, int slotId) async {
-    await ref.read(apiServiceProvider).bookSlot(slotId);
-    if (context.mounted) {
+    try {
+      await ref.read(apiServiceProvider).bookSlot(slotId);
+      ref.invalidate(trainerSlotsProvider(trainer.id));
+
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Session booked.')),
+      );
+    } catch (err) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to book: $err')),
       );
     }
   }
