@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Reschedule booking · FitMatrix{% endblock %}
+{% block content %}
+<section class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 space-y-8">
+  <header class="matrix-glass matrix-glow px-6 sm:px-8 py-8 rounded-[28px] space-y-3">
+    <h1 class="text-2xl font-semibold">Reschedule session</h1>
+    <p class="text-forest-muted text-sm">Select a new slot for {{ booking.slot.trainer.name }} at {{ booking.slot.place.name }}.</p>
+  </header>
+
+  <form method="post" class="matrix-glass matrix-shadow rounded-[26px] border border-transparent p-6 space-y-5">
+    {% csrf_token %}
+    <div>
+      <label for="id_new_slot" class="matrix-label">Available sessions</label>
+      {{ form.new_slot }}
+      {% for error in form.new_slot.errors %}
+        <p class="text-sm text-red-400 mt-2">{{ error }}</p>
+      {% endfor %}
+    </div>
+    <div class="flex items-center gap-3">
+      <button type="submit" class="matrix-btn">Reschedule</button>
+      <a href="{% url 'scheduling:booking-manage' %}" class="matrix-btn" data-variant="ghost">Cancel</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

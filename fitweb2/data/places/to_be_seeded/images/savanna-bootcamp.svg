@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
+  <defs>
+    <linearGradient id="gradSavanna" x1="0%" x2="100%" y1="100%" y2="0%">
+      <stop offset="0%" stop-color="#3c7020" />
+      <stop offset="100%" stop-color="#9fd84e" />
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#gradSavanna)" rx="36" />
+  <path d="M80 250 Q160 200 240 250 T400 250 T560 250" stroke="#ffffff" stroke-width="20" fill="none" opacity="0.9" />
+  <path d="M120 310 L200 180 L260 260 L320 160 L380 260 L440 200 L520 300" stroke="#ffe47a" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85" />
+  <text x="70" y="96" font-family="'Montserrat', sans-serif" font-size="50" font-weight="700" fill="#f7ffe6">Canopy Outdoor</text>
+  <text x="72" y="138" font-family="'Montserrat', sans-serif" font-size="26" fill="#efffd5" opacity="0.9">Bootcamps in the breeze</text>
+</svg>

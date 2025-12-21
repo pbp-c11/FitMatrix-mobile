@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Sign in · FitMatrix{% endblock %}
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 sm:px-10 lg:px-12 min-h-[calc(100vh-180px)] flex flex-col lg:flex-row lg:items-start gap-10 py-16">
+  <div class="flex-1 matrix-glass matrix-glow px-6 sm:px-9 py-9 rounded-[30px] space-y-6">
+    <span class="matrix-label">FitMatrix access</span>
+    <h1 class="text-3xl sm:text-[2.5rem] font-semibold leading-tight text-forest-ink">
+      Return to your personalised training matrix.
+    </h1>
+    <p class="text-forest-muted max-w-xl">
+      Pick up where you left off with saved facilities, coach sessions, and recovery rituals. Log in with your username or email to continue.
+    </p>
+    <div class="grid sm:grid-cols-2 gap-4">
+      <div class="matrix-glass" data-variant="soft" style="padding:1.35rem;border-radius:22px;">
+        <p class="text-xs uppercase tracking-[0.18em] text-forest-soft">Your matrix</p>
+        <p class="mt-2 font-semibold text-forest-ink">One login bridges studios, trainers, and recovery labs.</p>
+      </div>
+      <div class="matrix-glass" data-variant="soft" style="padding:1.35rem;border-radius:22px;">
+        <p class="text-xs uppercase tracking-[0.18em] text-forest-soft">Need an account?</p>
+        <p class="mt-2 font-semibold text-forest-ink">
+          <a href="{% url 'accounts:register' %}" class="underline decoration-emerald decoration-2 underline-offset-6 hover:decoration-4">Create one here.</a>
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="w-full max-w-md matrix-glass matrix-glow px-6 sm:px-8 py-8 rounded-[30px]">
+    <div class="space-y-2 text-center">
+      <span class="matrix-label">Welcome back</span>
+      <h2 class="text-2xl font-semibold text-forest-ink">Sign in to continue</h2>
+    </div>
+    <form method="post" class="mt-6 space-y-4">
+      {% csrf_token %}
+      <div class="space-y-1">
+        <label for="id_identifier" class="text-sm font-medium text-forest-ink">Username or email</label>
+        <input type="text" name="identifier" id="id_identifier" value="{{ form.identifier.value|default:'' }}" class="matrix-input" autocomplete="username" aria-invalid="{{ form.identifier.errors|yesno:'true,false' }}" required />
+        {% for error in form.identifier.errors %}
+          <p class="text-rose-500 text-sm" id="error_identifier">{{ error }}</p>
+        {% endfor %}
+      </div>
+      <div class="space-y-1">
+        <label for="id_password" class="text-sm font-medium text-forest-ink">Password</label>
+        <input type="password" name="password" id="id_password" class="matrix-input" autocomplete="current-password" aria-invalid="{{ form.password.errors|yesno:'true,false' }}" required />
+        {% for error in form.password.errors %}
+          <p class="text-rose-500 text-sm">{{ error }}</p>
+        {% endfor %}
+      </div>
+      {% if form.non_field_errors %}
+        <div class="bg-rose-100 border border-rose-200 text-rose-700 text-sm p-3 rounded-lg">
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+          {% if throttled %}<p>Please wait a moment before trying again.</p>{% endif %}
+        </div>
+      {% endif %}
+      <div class="flex items-center justify-between text-sm text-forest-soft">
+        <label class="flex items-center gap-2 text-forest-muted">
+          <input type="checkbox" class="h-4 w-4 border border-emerald/40 rounded" /> Remember me
+        </label>
+        <a href="#" class="text-forest-muted hover:text-forest-ink">Forgot password?</a>
+      </div>
+      <button type="submit" class="matrix-btn w-full">Sign in</button>
+    </form>
+    <p class="mt-6 text-sm text-center text-forest-muted">New here? <a href="{% url 'accounts:register' %}" class="text-forest-ink underline decoration-emerald decoration-2 underline-offset-6 hover:decoration-4">Create an account</a></p>
+  </div>
+</section>
+{% endblock %}

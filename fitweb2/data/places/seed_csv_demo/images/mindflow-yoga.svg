@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
+  <defs>
+    <linearGradient id="gradMind" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#2dce89" />
+      <stop offset="100%" stop-color="#3d7dff" />
+    </linearGradient>
+  </defs>
+  <rect width="640" height="400" fill="url(#gradMind)" rx="36" />
+  <path d="M120 220 C150 140 210 140 240 220 S330 300 360 220 S450 140 480 220" stroke="#ffffff" stroke-width="18" fill="none" opacity="0.9" />
+  <path d="M200 250 Q240 320 320 320 Q400 320 440 250" stroke="#ffffff" stroke-width="14" fill="none" opacity="0.75" />
+  <circle cx="320" cy="160" r="48" fill="#ffffff" opacity="0.85" />
+  <text x="72" y="94" font-family="'Montserrat', sans-serif" font-size="52" font-weight="700" fill="#ffffff">Meridian Mobility</text>
+  <text x="76" y="138" font-family="'Montserrat', sans-serif" font-size="26" fill="#dff7ff" opacity="0.9">Restore, align &amp; flow</text>
+</svg>

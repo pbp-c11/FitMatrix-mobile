@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Wishlist · FitMatrix{% endblock %}
+{% block content %}
+<section class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 pb-24 space-y-12">
+  <form id="wishlist-csrf" hidden>{% csrf_token %}</form>
+  <header class="matrix-gridline matrix-glass matrix-glow relative overflow-hidden">
+    <div class="matrix-hero-grid"></div>
+    <div class="relative space-y-4 py-10">
+      <p class="matrix-label">Your saved matrix</p>
+      <h1 class="text-4xl sm:text-[3rem] font-semibold leading-tight">Wishlist</h1>
+      <p class="text-forest-muted max-w-2xl">
+        Keep track of studios, recovery hubs, and trainers you want to experience next. Manage favourites and jump straight into booking when you're ready.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a href="{% url 'search:results' %}" class="matrix-btn" data-variant="ghost">Discover more venues</a>
+        <a href="{% url 'scheduling:sessions' %}" class="matrix-btn" data-variant="ghost">Browse trainer slots</a>
+      </div>
+    </div>
+  </header>
+
+  {% if page_obj %}
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" data-wishlist-grid>
+      {% for item in page_obj %}
+        <article class="matrix-card" data-variant="glass">
+          <div class="matrix-card__body space-y-4">
+            <div class="flex items-center justify-between">
+              <p class="matrix-meta-label">Saved {{ item.created_at|date:"M d" }}</p>
+              <button
+                type="button"
+                class="matrix-chip"
+                data-wishlist-toggle
+                data-url="{% if item.place %}{% url 'wishlist:toggle' 'place' item.place_id %}{% else %}{% url 'wishlist:toggle' 'trainer' item.trainer_id %}{% endif %}"
+                data-active="true"
+                data-label-active="Remove"
+                data-label-inactive="Remove"
+                aria-pressed="true"
+              >
+                Remove
+              </button>
+            </div>
+            <div class="space-y-2">
+              {% if item.place %}
+                <p class="matrix-meta-value">{{ item.place.city }}</p>
+                <h2 class="matrix-card__title">{{ item.place.name }}</h2>
+                <p class="text-forest-muted text-sm">{{ item.place.summary|truncatewords:16 }}</p>
+                <div class="flex flex-wrap items-center gap-3 justify-between">
+                  <span class="matrix-price-tag">
+                    {{ item.place.price_display }}
+                    <span>per session</span>
+                  </span>
+                  <a href="{{ item.place.get_absolute_url }}" class="matrix-btn" data-variant="ghost">View place</a>
+                </div>
+              {% else %}
+                <p class="matrix-meta-value">{{ item.trainer.specialties }}</p>
+                <h2 class="matrix-card__title">{{ item.trainer.name }}</h2>
+                <p class="text-forest-muted text-sm">Rating {{ item.trainer.rating_avg|floatformat:1 }} · {{ item.trainer.sessions.count }} sessions</p>
+                <div class="flex flex-wrap items-center gap-3 justify-between">
+                  <span class="matrix-price-tag">
+                    Personalised
+                    <span>per slot</span>
+                  </span>
+                  <a href="{% url 'scheduling:sessions' %}?trainer={{ item.trainer.pk }}" class="matrix-btn" data-variant="ghost">Book trainer</a>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+    {% include "components/paginator.html" with page_obj=page_obj %}
+    <div class="matrix-empty-state" data-wishlist-empty hidden>
+      <h2>No favourites yet</h2>
+      <p>Explore places and trainers to start building your FitMatrix.</p> 
+      <br>
+      <a href="{% url 'search:results' %}" class="matrix-btn">Browse venues</a>
+    </div>
+  {% else %}
+    <div class="matrix-empty-state" data-wishlist-empty>
+      <h2>No favourites yet</h2>
+      <p>Explore places and trainers to start building your FitMatrix.</p>
+      <br>
+      <a href="{% url 'search:results' %}" class="matrix-btn">Browse venues</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    const grid = document.querySelector('[data-wishlist-grid]');
+    const emptyState = document.querySelector('[data-wishlist-empty]');
+    if (!grid) {
+      return;
+    }
+
+    document.addEventListener('wishlist:toggled', (event) => {
+      const { button, added } = event.detail || {};
+      if (!button || added !== false) {
+        return;
+      }
+      if (!grid.contains(button)) {
+        return;
+      }
+      const card = button.closest('.matrix-card');
+      if (card) {
+        card.classList.add('animate-pulse');
+        setTimeout(() => {
+          card.remove();
+          if (!grid.querySelector('.matrix-card')) {
+            grid.remove();
+            emptyState?.removeAttribute('hidden');
+          }
+        }, 180);
+      }
+    });
+  })();
+</script>
+{% endblock %}
