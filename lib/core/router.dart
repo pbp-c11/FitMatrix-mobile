@@ -33,9 +33,9 @@ import '../features/trainers/trainer_list_screen.dart';
 import '../features/wishlist/wishlist_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final auth = ref.watch(authControllerProvider);
+  final auth = ref.read(authControllerProvider);
 
-  return GoRouter(
+  final router = GoRouter(
     initialLocation: '/home',
     refreshListenable: auth,
     redirect: (context, state) {
@@ -237,4 +237,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+
+  ref.onDispose(router.dispose);
+  return router;
 });
