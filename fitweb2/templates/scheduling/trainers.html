@@ -16,20 +16,40 @@
     </div>
   </header>
 
-  <form method="get" action="" class="matrix-search-form">
-    <div class="matrix-search-form__field--query">
+  <form method="get" action=""
+      class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end matrix-search-form">
+    <div class="sm:col-span-5">
       <label for="q">Search trainer</label>
-      <input id="q" name="q" type="text" value="{{ query }}" class="matrix-input" placeholder="Name or keyword" />
+      <input
+        id="q"
+        name="q"
+        type="text"
+        value="{{ query }}"
+        class="matrix-input w-full"
+        placeholder="Name or keyword"
+      />
     </div>
-    <div class="matrix-search-form__field--price">
+
+    <div class="sm:col-span-5">
       <label for="focus">Focus area</label>
-      <input id="focus" name="focus" type="text" value="{{ focus }}" class="matrix-input" placeholder="Strength, mobility, recovery" />
+      <input
+        id="focus"
+        name="focus"
+        type="text"
+        value="{{ focus }}"
+        class="matrix-input w-full"
+        placeholder="Strength, mobility, recovery"
+      />
     </div>
-    <div class="matrix-search-form__field--action">
-      <label>&nbsp;</label>
-      <button type="submit" class="matrix-btn w-full">Filter</button>
+
+    <div class="sm:col-span-2 flex">
+      <button type="submit" class="matrix-btn w-full">
+        Filter
+      </button>
     </div>
-  </form>
+</form>
+
+
 
   <div class="matrix-grid">
     {% for trainer in trainers %}

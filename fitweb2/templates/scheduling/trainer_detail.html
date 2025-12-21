@@ -10,33 +10,8 @@
         <p class="text-forest-muted">{{ trainer.bio|default:trainer.specialties }}</p>
         <div class="flex flex-wrap items-center gap-3 text-sm text-forest-muted">
           <span class="matrix-pill">Specialties: {{ trainer.specialties }}</span>
-          <span class="matrix-pill">Rating {{ trainer.rating_avg|floatformat:1 }}</span>
-          <span class="matrix-pill">{{ trainer.likes }} likes</span>
           <span class="matrix-pill">Rp {{ trainer.price_per_session|floatformat:0 }} / session</span>
         </div>
-      </div>
-      <div class="flex flex-col items-start gap-3">
-        {% if request.user.is_authenticated %}
-          <button
-            type="button"
-            class="matrix-btn"
-            data-variant="ghost"
-            data-wishlist-toggle
-            data-url="{% url 'wishlist:toggle' 'trainer' trainer.pk %}"
-            data-active="{% if is_favorite %}true{% else %}false{% endif %}"
-            data-label-active="Saved"
-            data-label-inactive="Save trainer"
-            aria-pressed="{% if is_favorite %}true{% else %}false{% endif %}"
-          >
-            {% if is_favorite %}Saved{% else %}Save trainer{% endif %}
-          </button>
-        {% else %}
-          <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="matrix-btn" data-variant="ghost">Login to save</a>
-        {% endif %}
-        {% if trainer.calendly_url %}
-          <a href="{{ trainer.calendly_url }}" target="_blank" rel="noopener" class="matrix-btn">Book via Calendly</a>
-        {% endif %}
-        <a href="{% url 'scheduling:booking-manage' %}" class="matrix-link">View my bookings</a>
       </div>
     </div>
   </header>
@@ -82,31 +57,6 @@
         </tbody>
       </table>
     </div>
-  </section>
-
-  <section class="space-y-6">
-    <div class="flex items-center justify-between gap-4">
-      <h2 class="matrix-section-title">Recent feedback</h2>
-      <a href="{% url 'reviews:list' %}" class="matrix-link">View all</a>
-    </div>
-    {% if reviews %}
-      <div class="space-y-4">
-        {% for review in reviews|slice:":5" %}
-          <article class="glass card bg-white/5 space-y-2">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="font-semibold">{{ review.user.display_name|default:review.user.username }}</p>
-                <p class="text-xs text-white/60">{{ review.created_at|date:"M d, Y" }}</p>
-              </div>
-              <span class="matrix-pill">{{ review.rating }}/5</span>
-            </div>
-            <p class="text-sm text-white/70">{{ review.comment }}</p>
-          </article>
-        {% endfor %}
-      </div>
-    {% else %}
-      <p class="text-white/70">No reviews yet. Book a session to share your feedback.</p>
-    {% endif %}
   </section>
 </section>
 {% endblock %}
