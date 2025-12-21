@@ -11,10 +11,6 @@ jobs:
     name: Build Android APK
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: fitmatrix_flutter
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,7 +24,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
+          flutter-version: '3.27.0'
           channel: 'stable'
 
       - name: Flutter pub get
@@ -40,6 +36,6 @@ jobs:
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fitmatrix-flutter-apk
-          path: fitmatrix_flutter/build/app/outputs/flutter-apk/app-release.apk
+          name: FitMatrix
+          path: build/app/outputs/flutter-apk/app-release.apk
 
